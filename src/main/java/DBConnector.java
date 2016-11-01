@@ -35,26 +35,6 @@ public class DBConnector {
             return new DefaultAWSCredentialsProviderChain();
         }
     }
-    /*
-    public static void initialize(){
-        String access = System.getProperty("access");
-        String secret = System.getProperty("secret");
-
-
-        // This will create a new instance of the object in case that it is not created yet
-        if(access == null || secret == null || access.equals("") || secret.equals("")){
-            client = new AmazonDynamoDBClient(new BasicAWSCredentials("access", "secret"));
-            // connect to local dynamoDB server
-            client.setEndpoint("http://localhost:8000");
-        }
-        else {  // This will just set the client object to connect to the dynamo database
-            client = new AmazonDynamoDBClient(new BasicAWSCredentials(access, secret));
-            client.setRegion(Region.US_West.toAWSRegion());
-        }
-        dynamoDB = new DynamoDB(client);
-    }
-
-    */
 
     public DBConnector() {
         client = new AmazonDynamoDBClient(getCredentialsProvider());
