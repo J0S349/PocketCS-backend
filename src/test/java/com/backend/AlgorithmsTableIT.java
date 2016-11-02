@@ -1,20 +1,13 @@
+package com.backend;
+
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
-import com.amazonaws.SystemDefaultDnsResolver;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.TableCollection;
-import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import javafx.scene.control.Tab;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.eclipse.jetty.util.ajax.JSON;
-import org.eclipse.jetty.util.ajax.JSONObjectConvertor;
+import com.backend.AlgorithmsTable;
+import com.backend.DBConnector;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;

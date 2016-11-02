@@ -1,3 +1,4 @@
+package com.backend;
 
 import com.amazonaws.auth.*;
 import com.amazonaws.regions.Regions;

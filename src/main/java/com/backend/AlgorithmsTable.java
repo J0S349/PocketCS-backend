@@ -1,20 +1,10 @@
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
-import com.amazonaws.services.dynamodbv2.datamodeling.unmarshallers.IntegerSetUnmarshaller;
-import com.amazonaws.services.dynamodbv2.datamodeling.unmarshallers.StringSetUnmarshaller;
+package com.backend;
+
 import com.amazonaws.services.dynamodbv2.document.*;
-import com.amazonaws.services.dynamodbv2.*;
-import com.amazonaws.services.dynamodbv2.document.internal.IteratorSupport;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
-import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
-import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
-import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
 import com.amazonaws.services.dynamodbv2.model.*;
-import com.amazonaws.services.s3.model.Region;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Peeps on 10/25/16.
@@ -149,6 +139,13 @@ public class AlgorithmsTable {
             throw new RuntimeException(ex);
         }
         return true; // Success table deletion
+    }
+
+    public String toString(){
+        // going to put a character that will be used for our delimeter
+        // in this case, going to use:
+
+        return table.toString();
     }
 }
 

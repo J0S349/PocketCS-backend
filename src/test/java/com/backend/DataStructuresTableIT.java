@@ -1,4 +1,8 @@
+package com.backend;
+
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.backend.DBConnector;
+import com.backend.DataStructuresTable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
