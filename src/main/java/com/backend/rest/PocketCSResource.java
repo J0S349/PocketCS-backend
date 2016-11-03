@@ -2,6 +2,7 @@ package com.backend.rest;
 
 import com.backend.*;
 
+import javax.swing.*;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -20,6 +21,8 @@ public class PocketCSResource {
     private static final String ALGORITHMS_TABLE = "Algorithms";
     private static final String DATA_STRUCTURES_TABLE = "dataStructures";
     private static final String SOFTWARE_DESIGN_TABLE = "softwareDesign";
+
+    // will be used to store the names of the tables for quick access
     private static HashSet<String> tables = new HashSet<String>();
 
 
@@ -27,36 +30,29 @@ public class PocketCSResource {
     private static DataStructuresTable dataStructuresTable;
     private static SoftwareDesignTable softwareDesignTable;
 
-
+    // adds table names to HashSet
     public void start(){
         tables.add(ALGORITHMS_TABLE);
         tables.add(DATA_STRUCTURES_TABLE);
         tables.add(SOFTWARE_DESIGN_TABLE);
     }
 
-    public void tearDown()
-    {
-        if(!tables.isEmpty())
-            tables.clear();
-    }
-
-    // Get the contents from a specific table
+    // Returns the contents from a specified table as JSON string
     @GET
-    @Path("/table")
+    @Path("/getTable")
     public Response getTableInfo(
             @QueryParam("tableName") String tableName
-    )
-    {
-        if (tableName == null){
+    ) {
+        // check whether no parameters were passed
+        if (tableName == null) {
             String msg = "missing parameter tableName";
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(msg)
                     .build();
-
         }
         start();
 
-        if(!tables.contains(tableName)){
+        if (!tables.contains(tableName)) {
             String msg = "table not found";
             System.out.println(msg);
             return Response.status(Response.Status.BAD_REQUEST)
@@ -64,18 +60,26 @@ public class PocketCSResource {
                     .build();
         }
 
-        if(tableName.equals(ALGORITHMS_TABLE)){
-
+        if (tableName.equals(ALGORITHMS_TABLE)) {
             algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
-            // will need to replace this so it can return a json string of
-            // all the items within the table.
-            return Response.ok(algorithmsTable.get(1).toJSON()).build();
-        }
+            return Response.ok(algorithmsTable.toJSON()).build();
 
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity("Something went wrong")
-                .build();
+        } else if (tableName.equals(DATA_STRUCTURES_TABLE)) {
+            dataStructuresTable = DataStructuresTable.openTable(DATA_STRUCTURES_TABLE, dbConnector);
+            return Response.ok(dataStructuresTable.toJSON()).build();
+
+        } else if (tableName.equals(SOFTWARE_DESIGN_TABLE)) {
+            softwareDesignTable = SoftwareDesignTable.openTable(SOFTWARE_DESIGN_TABLE, dbConnector);
+            return Response.ok(softwareDesignTable.toJSON()).build();
+
+        } else {
+            // if it doesn't return that, then return an error
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Something went wrong")
+                    .build();
+        }
     }
 
+    //
     
 }

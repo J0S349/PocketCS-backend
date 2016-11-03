@@ -39,14 +39,14 @@ public class PocketCSResourceTest extends JerseyTest{
 
     @Test
     public void TestingWithNoParameters(){
-        WebTarget webTarget = target("table");
+        WebTarget webTarget = target("getTable");
         Response response = webTarget.request().get();
         assertThat(response.getStatus(), equalTo(Response.Status.BAD_REQUEST.getStatusCode()));
     }
 
     @Test
     public void invalidTableNameEntered(){
-        WebTarget webTarget = target("table")
+        WebTarget webTarget = target("getTable")
                 .queryParam("tableName", "testing");
 
         Response response = webTarget.request().get();
@@ -55,7 +55,7 @@ public class PocketCSResourceTest extends JerseyTest{
 
     @Test
     public void validTableNameEntered(){
-        WebTarget webTarget = target("table")
+        WebTarget webTarget = target("getTable")
                 .queryParam("tableName", ALGORITHMS_TABLE);
 
         String result = webTarget.request().get(String.class);

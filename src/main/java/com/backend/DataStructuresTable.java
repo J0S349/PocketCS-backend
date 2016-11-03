@@ -1,11 +1,14 @@
 package com.backend;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.model.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Peeps on 10/26/16.
@@ -142,4 +145,23 @@ public class DataStructuresTable {
         return true; // Success table deletion
     }
 
+    // Returns a JSON string of all the Items within the table. Uses a
+    // '<->' for the delimeter to parse the string in the future.
+    public String toJSON(){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // get all the items from the table
+        ItemCollection<ScanOutcome> items = table.scan();
+
+        // get an iterator for the items in the table
+        Iterator<Item> iterator = items.iterator();
+
+        while (iterator.hasNext()){
+            stringBuilder.append(iterator.next().toJSON());
+            if(iterator.hasNext())
+                stringBuilder.append("<->");
+        }
+
+        return stringBuilder.toString();
+    }
 }
