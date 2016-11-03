@@ -1,29 +1,24 @@
 package com.backend;
 
-import com.amazonaws.services.dynamodbv2.document.*;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.model.*;
 
 import java.util.ArrayList;
 
 /**
- * Created by Peeps on 10/25/16.
+ * Created by GabrielZapata on 11/2/16.
  */
-public class AlgorithmsTable {
-    private static final String KEY_COLUMN = "algoID";
-    private static final String USER_ID_COLUMN = "userID";
-    private static final String NAME_COLUMN = "algoName";
-    private static final String CATEGORY_ID_COLUMN = "categoryID";
+public class DataStructuresCategoryTable {
+    private static final String KEY_COLUMN = "ID";
+    private static final String NAME_COLUMN = "name";
     private static final String DESCRIPTION_COLUMN = "description";
-    private static final String RUNTIME_COLUMN = "runtime";
-    private static final String IMAGE_ID_COLUMN = "imageID";
-    private static final String DATE_CREATED_COLUMN = "dateCreated";
-    private static final String DATE_UPDATED_COLUMN = "dateUpdated";
-    private static final String HELPFUL_LINK_COLUMN = "helpfulLink";
 
     private Table table;
 
-    public static AlgorithmsTable createTable(String tableName, DBConnector connector){
+    public static DataStructuresCategoryTable createTable(String tableName, DBConnector connector){
+
 
         ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
@@ -32,8 +27,8 @@ public class AlgorithmsTable {
                 .withAttributeType(ScalarAttributeType.N));
 
         // Create the KeySchema for knowing what is primary key(s) of the table
-         KeySchemaElement keySchema = new KeySchemaElement()
-                 .withAttributeName(KEY_COLUMN)
+        KeySchemaElement keySchema = new KeySchemaElement()
+                .withAttributeName(KEY_COLUMN)
                 .withKeyType(KeyType.HASH); //Partition key
 
         KeySchemaElement sortSchema = new KeySchemaElement().clone()
@@ -68,34 +63,26 @@ public class AlgorithmsTable {
             throw new RuntimeException(e);
         }
 
-        return new AlgorithmsTable(table);
 
+        return new DataStructuresCategoryTable(table);
     }
 
-    private AlgorithmsTable(Table table){
+    private DataStructuresCategoryTable(Table table){
         this.table = table;
     }
 
-    public static AlgorithmsTable openTable(String tableName, DBConnector connector){
+    public static DataStructuresCategoryTable openTable(String tableName, DBConnector connector){
         Table table = connector.getDynamoDB().getTable(tableName);
-        return new AlgorithmsTable(table);
+        return new DataStructuresCategoryTable(table);
     }
 
-    public void put(long id, long userID, String algoName, int categoryID, String description, String runtime,
-                    String imageID, String dateCreated, String dateUpdated, String helpfulLink)
+    public void put(long ID, String name, String description)
     {
 
         Item sessionRow = new Item()
-                .withPrimaryKey(KEY_COLUMN, id)
-                .withLong(USER_ID_COLUMN, userID)
-                .withString(NAME_COLUMN, algoName)
-                .withInt(CATEGORY_ID_COLUMN, categoryID)
-                .withString(DESCRIPTION_COLUMN, description)
-                .withString(RUNTIME_COLUMN, runtime)
-                .withString(IMAGE_ID_COLUMN, imageID)
-                .withString(DATE_CREATED_COLUMN, dateCreated)
-                .withString(DATE_UPDATED_COLUMN, dateUpdated)
-                .withString(HELPFUL_LINK_COLUMN, helpfulLink);
+                .withPrimaryKey(KEY_COLUMN, ID)
+                .withString(NAME_COLUMN, name)
+                .withString(DESCRIPTION_COLUMN, description);
         try{
             table.putItem(sessionRow);
 
@@ -106,25 +93,23 @@ public class AlgorithmsTable {
     }
 
     public void update(
-            long id, long userID, String algoName, int categoryID, String description, String runtime,
-            String imageID, String dateCreated, String dateUpdated, String helpfulLink
+            long ID, String name, String description
     )
     {
         // Taking advantage of tables ability to add / update an item that is entered into the table
-       put(id, userID, algoName, categoryID, description, runtime, imageID, dateCreated, dateUpdated, helpfulLink);
+        put(ID, name, description);
 
     }
 
-    public Item get(long id){
+    public Item get(long ID){
 
-        Item item = table.getItem(KEY_COLUMN, id);
+        Item item = table.getItem(KEY_COLUMN, ID);
         return item;
     }
-    public void delete(long id) {
-        DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, id);
+    public void delete(long ID) {
+        DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, ID);
         table.deleteItem(deleteItemSpec);
     }
-
     public boolean deleteTable() {
         try {
             table.delete();
@@ -140,15 +125,4 @@ public class AlgorithmsTable {
         }
         return true; // Success table deletion
     }
-
-    public String toJSON(){ // was toString()
-        // going to put a character that will be used for our delimeter (like ?)
-        //how to traverse all items in aws table
-        //convert each item into JSON and concatenate(use delimeter) into string builder
-        //return string
-        // in this case, going to use:
-
-        return table.toString();
-    }
 }
-
