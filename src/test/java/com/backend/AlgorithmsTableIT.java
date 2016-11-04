@@ -55,9 +55,9 @@ public class AlgorithmsTableIT {
 
     @Test
     public void updateItemOnTable(){
-        table.update(2,1,"Binary Search Algorithm", 1 ,"It is a searching algorithm", "Best Case: log(n) Worst Case: O(n)", "blah", "today", "never","blah");
+        table.update(1,1,"Binary Search Algorithm", 1 ,"It is a searching algorithm", "Best Case: log(n) Worst Case: O(n)", "blah", "today", "never","blah");
 
-        Item result = table.get(2);
+        Item result = table.get(1);
         String algoName = (String) result.get(NAME_COLUMN);
 
         assertThat(algoName, equalTo("Binary Search Algorithm"));
@@ -70,5 +70,11 @@ public class AlgorithmsTableIT {
         assertNull(table.get(2));
     }
 
+    @Test
+    public void ItemBeingUpdatedNotWithinTable(){
+        boolean success = table.update(2,1,"Binary Search Algorithm", 1 ,"It is a searching algorithm", "Best Case: log(n) Worst Case: O(n)", "blah", "today", "never","blah");
+
+        assertThat(success, equalTo(false));
+    }
 
 }
