@@ -110,14 +110,19 @@ public class DataStructuresTable {
         }
     }
 
-    public void update(
+    public boolean update(
             long DSID, long userID, String DSName, int categoryID, String description, String runtime,
             String imageID, String dateCreated, String dateUpdated, String helpfulLink
     )
     {
-        // Taking advantage of tables ability to add / update an item that is entered into the table
-        put(DSID, userID, DSName, categoryID, description, runtime, imageID, dateCreated, dateUpdated, helpfulLink);
+        if(table.getItem(KEY_COLUMN, DSID) != null) {
+            // Taking advantage of tables ability to add / update an item that is entered into the table
+            put(DSID, userID, DSName, categoryID, description, runtime, imageID, dateCreated, dateUpdated, helpfulLink);
+            return true;
+        }else{
 
+            return false;
+        }
     }
 
     public Item get(long DSID){

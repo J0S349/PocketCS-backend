@@ -111,11 +111,18 @@ public class SoftwareDesignTable {
         }
     }
 
-    public void update(
+    public boolean update(
             long SDID, long userID, String SDName, int categoryID, String description, String benefit_analogy, String downside_analogy,
             String imageID, String dateCreated, String dateUpdated, String helpfulLink) {
-        // Taking advantage of tables ability to add / update an item that is entered into the table
-        put(SDID, userID, SDName, categoryID, description, benefit_analogy, downside_analogy, imageID, dateCreated, dateUpdated, helpfulLink);
+
+        if(table.getItem(KEY_COLUMN, SDID) != null) {
+            // Taking advantage of tables ability to add / update an item that is entered into the table
+            put(SDID, userID, SDName, categoryID, description, benefit_analogy, downside_analogy, imageID, dateCreated, dateUpdated, helpfulLink);
+            return true;
+        }
+        else{
+            return false;
+        }
 
     }
 

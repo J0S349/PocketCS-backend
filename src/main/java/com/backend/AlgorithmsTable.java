@@ -106,21 +106,28 @@ public class AlgorithmsTable {
         }
     }
 
-    public void update(
+    public boolean update(
             long id, long userID, String algoName, int categoryID, String description, String runtime,
             String imageID, String dateCreated, String dateUpdated, String helpfulLink
     )
     {
-        // Taking advantage of tables ability to add / update an item that is entered into the table
-       put(id, userID, algoName, categoryID, description, runtime, imageID, dateCreated, dateUpdated, helpfulLink);
+
+        if(table.getItem(KEY_COLUMN,id) != null) {
+            // Taking advantage of tables ability to add / update an item that is entered into the table
+            put(id, userID, algoName, categoryID, description, runtime, imageID, dateCreated, dateUpdated, helpfulLink);
+            return true;
+        }
+        else{
+            return false;
+        }
 
     }
 
     public Item get(long id){
-
         Item item = table.getItem(KEY_COLUMN, id);
         return item;
     }
+
     public void delete(long id) {
         DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, id);
         table.deleteItem(deleteItemSpec);
