@@ -3,9 +3,10 @@ package com.backend;
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.google.common.base.Strings;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * Created by Peeps on 10/25/16.
@@ -167,6 +168,64 @@ public class AlgorithmsTable {
         }
 
         return stringBuilder.toString();
+    }
+
+    public HashSet<String> getTableAttributes(){
+        HashSet<String> hashSet = new HashSet<String>();
+
+        hashSet.add(KEY_COLUMN);
+        hashSet.add(USER_ID_COLUMN);
+        hashSet.add(NAME_COLUMN);
+        hashSet.add(CATEGORY_ID_COLUMN);
+        hashSet.add(DESCRIPTION_COLUMN);
+        hashSet.add(RUNTIME_COLUMN);
+        hashSet.add(IMAGE_ID_COLUMN);
+        hashSet.add(DATE_CREATED_COLUMN);
+        hashSet.add(DATE_UPDATED_COLUMN);
+        hashSet.add(HELPFUL_LINK_COLUMN);
+
+        return hashSet;
+    }
+
+    public boolean validItem(Item item){
+        HashSet<String> hashSet = getTableAttributes();
+
+        Map<String, Object> map = item.asMap();
+
+        Set<String> keys = map.keySet();
+        for (String key : keys) {
+            if (!hashSet.contains(key)) {
+                return false;
+            }
+
+            // since it is within the HashSet, then we can remove it
+            hashSet.remove(key);
+
+            // check if it has a value
+            if(map.get(key) == null){
+                return false;
+            } else {
+                Object object = map.get(key);
+
+                // for 'int' values, in dynamoDB, they are store as BigDecimal
+                if (object instanceof BigDecimal) {
+                    BigDecimal bigDecimal = (BigDecimal) object;
+                    if (bigDecimal.intValue() < 0) {
+                        return false;
+                    }
+                } else if (object instanceof String) {
+                    String string = (String) object;
+                    if (Strings.isNullOrEmpty(string)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // check whether the hashSet contains values, if it doesn't, then it doesn't meet the requirements
+        if(hashSet.isEmpty())
+            return true;
+        return false;
     }
 }
 

@@ -1,14 +1,22 @@
 package com.backend.rest;
 
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.backend.*;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 import java.lang.String;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -80,6 +88,57 @@ public class PocketCSResource {
         }
     }
 
-    //
-    
+    // Used to update an Item in the table.
+    @GET
+    @Path("/addItem")
+    public Response addItemToTable(
+            @QueryParam("tableName") String tableName,
+            @QueryParam("item") String item
+            ) throws UnsupportedEncodingException {
+
+        List<String> missing = new ArrayList<String>();
+        if(tableName == null) missing.add("table name");
+        if( item == null) missing.add("Item object");
+
+        if(!missing.isEmpty()){
+            String msg = "Missing parameters: " + missing.toString();
+            System.out.println(msg);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(msg)
+                    .build();
+        }
+
+        start();
+
+        if(!tables.contains(tableName)){
+            String msg = "table not found";
+            System.out.println(msg);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(msg)
+                    .build();
+        }
+
+        String decodedJSON = URLDecoder.decode(item, "UTF-8");
+        Item row = new Item().fromJSON(decodedJSON);
+
+        if(tableName.equals(ALGORITHMS_TABLE)){
+            AlgorithmsTable algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
+
+            if(algorithmsTable.validItem(row)){
+                System.out.println("row: " + row.toString());
+                return Response.ok("Valid Item").build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("invalid Item entered, does not meet the requirements for inserting value to "
+                            + ALGORITHMS_TABLE + " table")
+                    .build();
+        }
+
+        System.out.println("Not a valid item");
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("wrong")
+                .build();
+    }
+
+
 }

@@ -52,13 +52,13 @@ public class SoftwareDesignTableIT {
         Item result = table.get(2);
         String SDName = (String) result.get(NAME_COLUMN);
 
-        assertThat(SDName, equalTo("Singleton Design"));//<---
+        assertThat(SDName, equalTo("Singleton Design"));
     }
 
     @Test
     public void deleteItem(){
-        table.delete(2);
+        table.delete(1);
 
-        assertNull(table.get(2));
+        assertNull(table.get(1));
     }
 }
