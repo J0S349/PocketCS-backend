@@ -2,7 +2,6 @@ package com.backend.rest;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.backend.*;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.ws.rs.GET;

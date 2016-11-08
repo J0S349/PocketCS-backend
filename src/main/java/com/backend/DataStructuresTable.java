@@ -1,14 +1,12 @@
 package com.backend;
 
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.ItemCollection;
-import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
-import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.google.common.base.Strings;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * Created by Peeps on 10/26/16.
@@ -34,7 +32,7 @@ public class DataStructuresTable {
 
         attributeDefinitions.add(new AttributeDefinition()
                 .withAttributeName(KEY_COLUMN)
-                .withAttributeType(ScalarAttributeType.N));
+                .withAttributeType(ScalarAttributeType.S));
 
         // Create the KeySchema for knowing what is primary key(s) of the table
         KeySchemaElement keySchema = new KeySchemaElement()
@@ -86,53 +84,66 @@ public class DataStructuresTable {
         return new DataStructuresTable(table);
     }
 
-    public void put(long DSID, long userID, String DSName, int categoryID, String description, String runtime,
-                    String imageID, String dateCreated, String dateUpdated, String helpfulLink)
-    {
+    public boolean put(Item item){
+        if(!validItem(item))
+            return false;
 
-        Item sessionRow = new Item()
-                .withPrimaryKey(KEY_COLUMN, DSID)
-                .withLong(USER_ID_COLUMN, userID)
-                .withString(NAME_COLUMN, DSName)
-                .withInt(CATEGORY_ID_COLUMN, categoryID)
-                .withString(DESCRIPTION_COLUMN, description)
-                .withString(RUNTIME_COLUMN, runtime)
-                .withString(IMAGE_ID_COLUMN, imageID)
-                .withString(DATE_CREATED_COLUMN, dateCreated)
-                .withString(DATE_UPDATED_COLUMN, dateUpdated)
-                .withString(HELPFUL_LINK_COLUMN, helpfulLink);
-        try{
-            table.putItem(sessionRow);
+        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) == null)
+        {
+            try{
+                table.putItem(item);
+                return true;
+            } catch (Exception e){
+                return false;
+            }
 
-        } catch (Exception e){
-            System.out.println("Error adding row to table");
-            e.printStackTrace();
         }
-    }
-
-    public boolean update(
-            long DSID, long userID, String DSName, int categoryID, String description, String runtime,
-            String imageID, String dateCreated, String dateUpdated, String helpfulLink
-    )
-    {
-        if(table.getItem(KEY_COLUMN, DSID) != null) {
-            // Taking advantage of tables ability to add / update an item that is entered into the table
-            put(DSID, userID, DSName, categoryID, description, runtime, imageID, dateCreated, dateUpdated, helpfulLink);
-            return true;
-        }else{
-
+        else{
             return false;
         }
     }
 
-    public Item get(long DSID){
+    public boolean update(Item item){
 
-        Item item = table.getItem(KEY_COLUMN, DSID);
+        // contains all the appropriate attributes
+        if(!validItem(item))
+            return false;
+        // check that the item is within the table already
+        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) != null){
+
+            // try adding it to the table
+            try {
+                // take advantage of table's ability to add / update values
+                // with putItem function
+                table.putItem(item);
+                return true;
+            } catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
+    public Item getItemWithAttribute(String columnName, String value){
+        Item item = table.getItem(columnName, value);
         return item;
     }
-    public void delete(long DSID) {
+    public Item getItemWithAttribute(String columnName, long value){
+        Item item = table.getItem(columnName, value);
+        return item;
+    }
+
+    public boolean deleteItemWithPrimaryKey(String DSID) {
         DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, DSID);
-        table.deleteItem(deleteItemSpec);
+        try {
+            table.deleteItem(deleteItemSpec);
+            return true;
+        } catch (Exception e){
+            return false;
+        }
     }
     public boolean deleteTable() {
         try {
@@ -169,4 +180,74 @@ public class DataStructuresTable {
 
         return stringBuilder.toString();
     }
+    public HashSet<String> getTableAttributes(){
+        HashSet<String> hashSet = new HashSet<String>();
+
+        hashSet.add(KEY_COLUMN);
+        hashSet.add(USER_ID_COLUMN);
+        hashSet.add(NAME_COLUMN);
+        hashSet.add(CATEGORY_ID_COLUMN);
+        hashSet.add(DESCRIPTION_COLUMN);
+        hashSet.add(RUNTIME_COLUMN);
+        hashSet.add(IMAGE_ID_COLUMN);
+        hashSet.add(DATE_CREATED_COLUMN);
+        hashSet.add(DATE_UPDATED_COLUMN);
+        hashSet.add(HELPFUL_LINK_COLUMN);
+
+        return hashSet;
+    }
+
+    public boolean validItem(Item item){
+        HashSet<String> hashSet = getTableAttributes();
+
+        Map<String, Object> map = item.asMap();
+
+        Set<String> keys = map.keySet();
+
+        for (String key : keys) {
+            if (!hashSet.contains(key)) {
+                return false;
+            }
+
+            // since it is within the HashSet, then we can remove it
+            hashSet.remove(key);
+
+            // check if it has a value
+            if(map.get(key) == null){
+                return false;
+            } else {
+                Object object = map.get(key);
+
+                // for 'int' values, in dynamoDB, they are store as BigDecimal
+                if (object instanceof BigDecimal) {
+                    BigDecimal bigDecimal = (BigDecimal) object;
+                    if (bigDecimal.intValue() < 0) {
+                        return false;
+                    }
+                } else if (object instanceof String) {
+                    String string = (String) object;
+                    if (Strings.isNullOrEmpty(string)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // check whether the hashSet contains values, if it doesn't, then it doesn't meet the requirements
+        if(hashSet.isEmpty())
+            return true;
+        return false;
+    }
+    // Getters for accessing column names
+    public static String getKeyColumn(){return KEY_COLUMN;}
+    public static String getNameColumn(){return NAME_COLUMN; }
+    public static String getDescriptionColumn(){return DESCRIPTION_COLUMN; }
+    public static String getUserIdColumn(){return USER_ID_COLUMN;}
+    public static String getCategoryIdColumn(){return CATEGORY_ID_COLUMN; }
+    public static String getRuntimeColumn(){return RUNTIME_COLUMN; }
+    public static String getImageIdColumn(){return IMAGE_ID_COLUMN; }
+    public static String getDateCreatedColumn(){return DATE_CREATED_COLUMN; }
+    public static String getDateUpdatedColumn(){return DATE_UPDATED_COLUMN; }
+    public static String getHelpfulLinkColumn(){return HELPFUL_LINK_COLUMN; }
+
 }

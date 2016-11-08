@@ -4,10 +4,9 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.backend.AlgorithmsTable;
-import com.google.gson.Gson;
-import com.sun.deploy.net.URLEncoder;
+
+//import com.sun.deploy.net.URLEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.*;
@@ -18,6 +17,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Created by Peeps on 11/2/16.
@@ -32,27 +32,6 @@ public class PocketCSResourceTest extends JerseyTest{
     protected Application configure() {
         return new ResourceConfig(PocketCSResource.class);
     }
-
-//    @Before
-//    public void setup(){
-//        Item sessionRow = new Item()
-//                .withPrimaryKey(KEY_COLUMN, id)
-//                .withLong(USER_ID_COLUMN, userID)
-//                .withString(NAME_COLUMN, algoName)
-//                .withInt(CATEGORY_ID_COLUMN, categoryID)
-//                .withString(DESCRIPTION_COLUMN, description)
-//                .withString(RUNTIME_COLUMN, runtime)
-//                .withString(IMAGE_ID_COLUMN, imageID)
-//                .withString(DATE_CREATED_COLUMN, dateCreated)
-//                .withString(DATE_UPDATED_COLUMN, dateUpdated)
-//                .withString(HELPFUL_LINK_COLUMN, helpfulLink);
-//    }
-//
-////    @After
-//    public void teardown(){
-//        WebTarget webTarget = target("destroy");
-//        webTarget.request();
-//    }
 
     @Test
     public void TestingWithNoParameters(){
@@ -78,7 +57,6 @@ public class PocketCSResourceTest extends JerseyTest{
         String result = webTarget.request().get(String.class);
 
         assertNotNull(result);
-        //System.out.println("Results: " + result);
     }
 
     // Testing addItem End point
@@ -148,6 +126,5 @@ public class PocketCSResourceTest extends JerseyTest{
         String response = webTarget.request().get(String.class);
         assertEquals(response, "Valid Item");
     }
-
 
 }

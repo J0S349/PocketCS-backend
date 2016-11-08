@@ -31,7 +31,7 @@ public class AlgorithmsTable {
 
         attributeDefinitions.add(new AttributeDefinition()
                 .withAttributeName(KEY_COLUMN)
-                .withAttributeType(ScalarAttributeType.N));
+                .withAttributeType(ScalarAttributeType.S));
 
         // Create the KeySchema for knowing what is primary key(s) of the table
          KeySchemaElement keySchema = new KeySchemaElement()
@@ -83,55 +83,70 @@ public class AlgorithmsTable {
         return new AlgorithmsTable(table);
     }
 
-    public void put(long id, long userID, String algoName, int categoryID, String description, String runtime,
-                    String imageID, String dateCreated, String dateUpdated, String helpfulLink)
-    {
+    public boolean put(Item item){
 
-        Item sessionRow = new Item()
-                .withPrimaryKey(KEY_COLUMN, id)
-                .withLong(USER_ID_COLUMN, userID)
-                .withString(NAME_COLUMN, algoName)
-                .withInt(CATEGORY_ID_COLUMN, categoryID)
-                .withString(DESCRIPTION_COLUMN, description)
-                .withString(RUNTIME_COLUMN, runtime)
-                .withString(IMAGE_ID_COLUMN, imageID)
-                .withString(DATE_CREATED_COLUMN, dateCreated)
-                .withString(DATE_UPDATED_COLUMN, dateUpdated)
-                .withString(HELPFUL_LINK_COLUMN, helpfulLink);
-        try{
-            table.putItem(sessionRow);
+        //check if it contains the appropriate paramters
+        if(!validItem(item))
+            return false;
 
-        } catch (Exception e){
-            System.out.println("Error adding row to table");
-            e.printStackTrace();
+        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) == null)
+        {
+            try{
+                table.putItem(item);
+                return true;
+
+            } catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
         }
+        return false;
     }
 
-    public boolean update(
-            long id, long userID, String algoName, int categoryID, String description, String runtime,
-            String imageID, String dateCreated, String dateUpdated, String helpfulLink
-    )
-    {
+    public boolean update(Item item){
 
-        if(table.getItem(KEY_COLUMN,id) != null) {
-            // Taking advantage of tables ability to add / update an item that is entered into the table
-            put(id, userID, algoName, categoryID, description, runtime, imageID, dateCreated, dateUpdated, helpfulLink);
-            return true;
-        }
-        else{
+        // check if it is a valid item
+        if(!validItem(item)){
             return false;
         }
 
+        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) != null){
+            try{
+
+                table.putItem(item);
+                return true;
+
+            } catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+        }
+        else{
+            // there is no item to update
+            return false;
+        }
     }
 
-    public Item get(long id){
-        Item item = table.getItem(KEY_COLUMN, id);
+    // will return the first item that it matches with
+    public Item getItemWithAttribute(String columnName, String value){
+        Item item = table.getItem(columnName, value);
         return item;
     }
 
-    public void delete(long id) {
+    public Item getItemWithAttribute(String columnName, long value){
+        Item item = table.getItem(columnName, value);
+        return item;
+    }
+
+    public boolean deleteItemWithPrimaryKey(String id) {
         DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, id);
-        table.deleteItem(deleteItemSpec);
+        try {
+            table.deleteItem(deleteItemSpec);
+            return true;
+        }catch (Exception e){
+
+            return false;
+        }
     }
 
     public boolean deleteTable() {
@@ -151,7 +166,7 @@ public class AlgorithmsTable {
     }
 
     // Returns a JSON string of all the Items within the table. Uses a
-    // '<->' for the delimeter to parse the string in the future.
+    // '<->' for the delimiter to parse the string in the future.
     public String toJSON(){
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -166,7 +181,6 @@ public class AlgorithmsTable {
             if(iterator.hasNext())
                 stringBuilder.append("<->");
         }
-
         return stringBuilder.toString();
     }
 
@@ -193,6 +207,7 @@ public class AlgorithmsTable {
         Map<String, Object> map = item.asMap();
 
         Set<String> keys = map.keySet();
+
         for (String key : keys) {
             if (!hashSet.contains(key)) {
                 return false;
@@ -227,5 +242,18 @@ public class AlgorithmsTable {
             return true;
         return false;
     }
+
+
+    // Getters for accessing column names
+    public static String getKeyColumn(){return KEY_COLUMN;}
+    public static String getNameColumn(){return NAME_COLUMN; }
+    public static String getDescriptionColumn(){return DESCRIPTION_COLUMN; }
+    public static String getUserIdColumn(){return USER_ID_COLUMN;}
+    public static String getCategoryIdColumn(){return CATEGORY_ID_COLUMN; }
+    public static String getRuntimeColumn(){return RUNTIME_COLUMN; }
+    public static String getImageIdColumn(){return IMAGE_ID_COLUMN; }
+    public static String getDateCreatedColumn(){return DATE_CREATED_COLUMN; }
+    public static String getDateUpdatedColumn(){return DATE_UPDATED_COLUMN; }
+    public static String getHelpfulLinkColumn(){return HELPFUL_LINK_COLUMN; }
 }
 
