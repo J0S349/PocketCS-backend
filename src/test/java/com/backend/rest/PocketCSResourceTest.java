@@ -18,6 +18,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.UUID;
 
 /**
  * Created by Peeps on 11/2/16.
@@ -91,9 +92,6 @@ public class PocketCSResourceTest extends JerseyTest{
                 .withString("runtime", "bla")
                 .withString("imageID", "rea")
                 .withString("dateCreated", "fds");
-                //.withString("dateUpdated", "")
-                //.withString("helpfulLink", "");
-
 
         WebTarget webTarget;
         webTarget = target("addItem")
@@ -107,7 +105,7 @@ public class PocketCSResourceTest extends JerseyTest{
     @Test
     public void insertItemWithValidTableNameAndValidItem() throws UnsupportedEncodingException {
         Item sessionRow = new Item()
-                .withPrimaryKey("algoID", 1)
+                .withPrimaryKey("algoID", UUID.randomUUID().toString())
                 .withLong("userID", 0)
                 .withString("algoName", "Binary Search")
                 .withInt("categoryID", 0)
@@ -124,7 +122,7 @@ public class PocketCSResourceTest extends JerseyTest{
                 .queryParam("item", URLEncoder.encode(sessionRow.toJSON(), "UTF-8")); // encode JSON string
 
         String response = webTarget.request().get(String.class);
-        assertEquals(response, "Valid Item");
+        assertEquals(response.intern(), "Success");
     }
 
 }

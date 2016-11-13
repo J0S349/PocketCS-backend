@@ -249,5 +249,5 @@ public class DataStructuresTable {
     public static String getDateCreatedColumn(){return DATE_CREATED_COLUMN; }
     public static String getDateUpdatedColumn(){return DATE_UPDATED_COLUMN; }
     public static String getHelpfulLinkColumn(){return HELPFUL_LINK_COLUMN; }
-
+    public static String getTableName(){return TABLE_NAME; }
 }

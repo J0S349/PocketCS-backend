@@ -6,15 +6,17 @@ import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.google.common.base.Strings;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * Created by Peeps on 10/31/16.
  */
 
 public class SoftwareDesignTable {
+    private static final String TABLE_NAME = "SoftwareDesign";
     private static final String KEY_COLUMN = "SDID";
     private static final String USER_ID_COLUMN = "userID";
     private static final String NAME_COLUMN = "SDName";
@@ -35,7 +37,7 @@ public class SoftwareDesignTable {
 
         attributeDefinitions.add(new AttributeDefinition()
                 .withAttributeName(KEY_COLUMN)
-                .withAttributeType(ScalarAttributeType.N));
+                .withAttributeType(ScalarAttributeType.S));
 
         // Create the KeySchema for knowing what is primary key(s) of the table
         KeySchemaElement keySchema = new KeySchemaElement()
@@ -62,7 +64,6 @@ public class SoftwareDesignTable {
             table = connector.getDynamoDB().createTable(request);
         } catch (Exception e) {
 
-            e.printStackTrace();
             return null;
         }
 
@@ -87,55 +88,51 @@ public class SoftwareDesignTable {
         return new SoftwareDesignTable(table);
     }
 
-    public void put(long SDID, long userID, String SDName, int categoryID, String description, String benefit_analogy, String downside_analogy,
-                    String imageID, String dateCreated, String dateUpdated, String helpfulLink) {
-
-        Item sessionRow = new Item()
-                .withPrimaryKey(KEY_COLUMN, SDID)
-                .withLong(USER_ID_COLUMN, userID)
-                .withString(NAME_COLUMN, SDName)
-                .withInt(CATEGORY_ID_COLUMN, categoryID)
-                .withString(DESCRIPTION_COLUMN, description)
-                .withString(BENEFIT_COLUMN, benefit_analogy)
-                .withString(DOWNSIDE_COLUMN, downside_analogy)
-                .withString(IMAGE_ID_COLUMN, imageID)
-                .withString(DATE_CREATED_COLUMN, dateCreated)
-                .withString(DATE_UPDATED_COLUMN, dateUpdated)
-                .withString(HELPFUL_LINK_COLUMN, helpfulLink);
-        try {
-            table.putItem(sessionRow);
-
-        } catch (Exception e) {
-            System.out.println("Error adding row to table");
-            e.printStackTrace();
-        }
-    }
-
-    public boolean update(
-            long SDID, long userID, String SDName, int categoryID, String description, String benefit_analogy, String downside_analogy,
-            String imageID, String dateCreated, String dateUpdated, String helpfulLink) {
-
-        if(table.getItem(KEY_COLUMN, SDID) != null) {
-            // Taking advantage of tables ability to add / update an item that is entered into the table
-            put(SDID, userID, SDName, categoryID, description, benefit_analogy, downside_analogy, imageID, dateCreated, dateUpdated, helpfulLink);
-            return true;
-        }
-        else{
+    public boolean put(Item item){
+        if(!validItem(item)){
             return false;
         }
 
+        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) == null){
+            try{
+                table.putItem(item);
+                return true;
+
+            } catch (Exception e){
+                return false;
+            }
+        }
+        return false;
     }
 
+    public boolean update(Item item){
 
-    public Item get(long SDID) {
+        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) != null) {
+            // Taking advantage of tables ability to add / update an item that is entered into the table
+            try{
 
-        Item item = table.getItem(KEY_COLUMN, SDID);
-        return item;
+                table.putItem(item);
+                return true;
+
+            } catch (Exception e){
+                return false;
+            }
+        }
+        return false;
     }
 
-    public void delete(long SDID) {
-        DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, SDID);
-        table.deleteItem(deleteItemSpec);
+    public Item getItemWithAttribute(String attribute, String key) {
+        return table.getItem(attribute, key);
+    }
+
+    public boolean deleteItemWithPrimaryKey(String ID) {
+        DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN,ID);
+        try {
+            table.deleteItem(deleteItemSpec);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 
     public boolean deleteTable() {
@@ -154,7 +151,66 @@ public class SoftwareDesignTable {
         return true; // Success table deletion
     }
 
-    // Returns a JSON string of all the Items within the table. Uses a
+    public HashSet<String> getTableAttributes(){
+        HashSet<String> hashSet = new HashSet<String>();
+
+        hashSet.add(KEY_COLUMN);
+        hashSet.add(USER_ID_COLUMN);
+        hashSet.add(NAME_COLUMN);
+        hashSet.add(CATEGORY_ID_COLUMN);
+        hashSet.add(DESCRIPTION_COLUMN);
+        hashSet.add(BENEFIT_COLUMN);
+        hashSet.add(DOWNSIDE_COLUMN);
+        hashSet.add(IMAGE_ID_COLUMN);
+        hashSet.add(DATE_CREATED_COLUMN);
+        hashSet.add(DATE_UPDATED_COLUMN);
+        hashSet.add(HELPFUL_LINK_COLUMN);
+
+        return hashSet;
+    }
+
+    public boolean validItem(Item item) {
+        HashSet<String> hashSet = getTableAttributes();
+
+        Map<String, Object> map = item.asMap();
+
+        Set<String> keys = map.keySet();
+
+        for (String key : keys) {
+            if (!hashSet.contains(key)) {
+                return false;
+            }
+
+            // since it is within the HashSet, then we can remove it
+            hashSet.remove(key);
+
+            // check if it has a value
+            if (map.get(key) == null) {
+                return false;
+            } else {
+                Object object = map.get(key);
+
+                // for 'int' values, in dynamoDB, they are store as BigDecimal
+                if (object instanceof BigDecimal) {
+                    BigDecimal bigDecimal = (BigDecimal) object;
+                    if (bigDecimal.intValue() < 0) {
+                        return false;
+                    }
+                } else if (object instanceof String) {
+                    String string = (String) object;
+                    if (Strings.isNullOrEmpty(string)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        // check whether the hashSet contains values, if it doesn't, then it doesn't meet the requirements
+        if(hashSet.isEmpty())
+            return true;
+        return false;
+    }
+
+        // Returns a JSON string of all the Items within the table. Uses a
     // '<->' for the delimeter to parse the string in the future.
     public String toJSON(){
         StringBuilder stringBuilder = new StringBuilder();
@@ -173,4 +229,18 @@ public class SoftwareDesignTable {
 
         return stringBuilder.toString();
     }
+
+    public static String getTableName(){return TABLE_NAME;}
+    public static String getKeyColumn(){return KEY_COLUMN; }
+    public static String getUserIdColumn(){return USER_ID_COLUMN; }
+    public static String getNameColumn(){return NAME_COLUMN; }
+    public static String getCategoryIdColumn(){return CATEGORY_ID_COLUMN; }
+    public static String getDescriptionColumn(){return DESCRIPTION_COLUMN;}
+    public static String getBenefitColumn(){return BENEFIT_COLUMN;}
+    public static String getDownsideColumn(){return DOWNSIDE_COLUMN; }
+    public static String getImageIdColumn(){return IMAGE_ID_COLUMN; }
+    public static String getDateCreatedColumn(){return DATE_CREATED_COLUMN; }
+    public static String getDateUpdatedColumn(){return DATE_UPDATED_COLUMN; }
+    public static String getHelpfulLinkColumn(){return HELPFUL_LINK_COLUMN; }
+
 }

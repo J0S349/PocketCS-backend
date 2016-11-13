@@ -7,6 +7,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -21,6 +25,8 @@ public class SoftwareDesignTableIT {
 
     private DBConnector connector;
     private SoftwareDesignTable table;
+    private static Item sessionRow;
+
 
     @Before
     public void connect()
@@ -30,7 +36,23 @@ public class SoftwareDesignTableIT {
         table = SoftwareDesignTable.createTable(TABLE_NAME, connector);
 
         // Adding the same values every time
-        table.put(2,0, "Singleton", 1, "fill later", "its good", "its bad", "image.png", "01/01/16", "00/00/16", "linktohelp.com");
+        String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+
+        sessionRow = new Item()
+                .withPrimaryKey(SoftwareDesignTable.getKeyColumn(), UUID.randomUUID().toString())
+                .withLong(SoftwareDesignTable.getUserIdColumn(), 0)
+                .withString(SoftwareDesignTable.getNameColumn(), "Singleton")
+                .withLong(SoftwareDesignTable.getCategoryIdColumn(), 3)
+                .withString(SoftwareDesignTable.getDescriptionColumn(), "It prevents you from creating new instances across different" +
+                            " screens which is helpful when working with database instances")
+                .withString(SoftwareDesignTable.getBenefitColumn(), "The same instance can be sharec across different instances")
+                .withString(SoftwareDesignTable.getDownsideColumn(), "The object's data can be manipulated by other programs")
+                .withString(SoftwareDesignTable.getImageIdColumn(), "null")
+                .withString(SoftwareDesignTable.getDateCreatedColumn(), timeStamp)
+                .withString(SoftwareDesignTable.getDateUpdatedColumn(), timeStamp)
+                .withString(SoftwareDesignTable.getHelpfulLinkColumn(), "null");
+
+        table.put(sessionRow);
     }
 
     @After
@@ -41,24 +63,27 @@ public class SoftwareDesignTableIT {
 
     @Test
     public void createAndVerifyTable(){
-        Item result = table.get(2);
-        String DSName = (String) result.get(NAME_COLUMN);
+        String keyColumn = SoftwareDesignTable.getKeyColumn();
+        Item row = table.getItemWithAttribute(SoftwareDesignTable.getKeyColumn(), sessionRow.getString(keyColumn));
+        String name = row.getString(SoftwareDesignTable.getNameColumn());
 
-        assertThat(DSName, equalTo("Singleton"));//<---
+        assertThat(name, equalTo("Singleton"));//<---
     }
+
+
     @Test
     public void updateItemOnTable(){
-        table.update(2,0, "Singleton Design", 1, "fill later", "its good", "its bad", "image.png", "01/01/16", "00/00/16", "linktohelp.com");
-        Item result = table.get(2);
-        String SDName = (String) result.get(NAME_COLUMN);
 
-        assertThat(SDName, equalTo("Singleton Design"));
+        sessionRow.withString(SoftwareDesignTable.getNameColumn(), "Singleton Pattern");
+        //table.update(2,0, "Singleton Design", 1, "fill later", "its good", "its bad", "image.png", "01/01/16", "00/00/16", "linktohelp.com");
+        boolean result = table.update(sessionRow);
+
+        assertThat(result, equalTo(true));
     }
 
     @Test
     public void deleteItem(){
-        table.delete(1);
-
-        assertNull(table.get(1));
+        boolean result = table.deleteItemWithPrimaryKey(sessionRow.getString(SoftwareDesignTable.getKeyColumn()));
+        assertThat(result, equalTo(true));
     }
 }

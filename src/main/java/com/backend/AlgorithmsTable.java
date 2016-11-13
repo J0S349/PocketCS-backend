@@ -57,8 +57,6 @@ public class AlgorithmsTable {
         try {
             table = connector.getDynamoDB().createTable(request);
         } catch (Exception e){
-
-            e.printStackTrace();
             return null;
         }
 
@@ -96,7 +94,6 @@ public class AlgorithmsTable {
                 return true;
 
             } catch (Exception e){
-                e.printStackTrace();
                 return false;
             }
         }
@@ -117,7 +114,6 @@ public class AlgorithmsTable {
                 return true;
 
             } catch (Exception e){
-                e.printStackTrace();
                 return false;
             }
         }
@@ -144,7 +140,6 @@ public class AlgorithmsTable {
             table.deleteItem(deleteItemSpec);
             return true;
         }catch (Exception e){
-
             return false;
         }
     }

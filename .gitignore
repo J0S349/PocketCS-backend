@@ -45,4 +45,5 @@ captures/
 /.idea/**
 *.iml
 access.ini
+.DS_Store
 */.DS_Store

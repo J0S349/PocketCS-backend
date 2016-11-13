@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.lang.String;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +50,7 @@ public class PocketCSResource {
     @Path("/getTable")
     public Response getTableInfo(
             @QueryParam("tableName") String tableName
-    ) {
+    ) throws UnsupportedEncodingException {
         // check whether no parameters were passed
         if (tableName == null) {
             String msg = "missing parameter tableName";
@@ -69,15 +70,16 @@ public class PocketCSResource {
 
         if (tableName.equals(ALGORITHMS_TABLE)) {
             algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
-            return Response.ok(algorithmsTable.toJSON()).build();
+            return Response.ok(URLEncoder.encode(algorithmsTable.toJSON(), "UTF-8")).build();
+
 
         } else if (tableName.equals(DATA_STRUCTURES_TABLE)) {
             dataStructuresTable = DataStructuresTable.openTable(DATA_STRUCTURES_TABLE, dbConnector);
-            return Response.ok(dataStructuresTable.toJSON()).build();
+            return Response.ok(URLEncoder.encode(dataStructuresTable.toJSON(), "UTF-8")).build();
 
         } else if (tableName.equals(SOFTWARE_DESIGN_TABLE)) {
             softwareDesignTable = SoftwareDesignTable.openTable(SOFTWARE_DESIGN_TABLE, dbConnector);
-            return Response.ok(softwareDesignTable.toJSON()).build();
+            return Response.ok(URLEncoder.encode(softwareDesignTable.toJSON(), "UTF-8")).build();
 
         } else {
             // if it doesn't return that, then return an error
@@ -124,12 +126,48 @@ public class PocketCSResource {
             AlgorithmsTable algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
 
             if(algorithmsTable.validItem(row)){
-                System.out.println("row: " + row.toString());
-                return Response.ok("Valid Item").build();
+                boolean status = algorithmsTable.put(row);
+                //boolean status = false;
+                if(status)
+                    return Response.ok("Success").build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Unable to add to " + ALGORITHMS_TABLE + " table")
+                        .build();
             }
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("invalid Item entered, does not meet the requirements for inserting value to "
                             + ALGORITHMS_TABLE + " table")
+                    .build();
+        }
+        else if(tableName.equals(DataStructuresTable.getTableName())){
+            if(dataStructuresTable.validItem(row)){
+                boolean status = dataStructuresTable.put(row);
+                //boolean status = false;
+                if(status)
+                    return Response.ok("Success").build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Unable to add to " + DataStructuresTable.getTableName() + " table")
+                        .build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("invalid Item entered, does not meet the requirements for inserting value to "
+                            + DataStructuresTable.getTableName() + " table")
+                    .build();
+        }
+        else if(tableName.equals(SoftwareDesignTable.getTableName())){
+
+            if(softwareDesignTable.validItem(row)){ //still need to create this function in the table class
+                boolean status = softwareDesignTable.put(row); //fix attributes (i believe that is the issue with this 'put' function)
+
+                if(status)
+                    return Response.ok("Success").build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Unable to add to " + SoftwareDesignTable.getTableName() + " table")
+                        .build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("invalid Item entered, does not meet the requirements for inserting value to "
+                            + SoftwareDesignTable.getTableName() + " table")
                     .build();
         }
 
