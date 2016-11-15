@@ -61,7 +61,8 @@ public class AlgorithmsCategoryTableIT {
 
     @Test
     public void updateItemOnTable(){
-        sessionRow.with(AlgorithmsCategoryTable.getNameColumn(), "Divide_and_conquer");
+        sessionRow.with(AlgorithmsCategoryTable.getNameColumn(), "Divide_and_conquer"); //update attribute name and check to make sure it updates
+                                                                                        //in the AWS table.
         boolean status = table.update(sessionRow); //simplified the past test to make
         assertThat(status, equalTo(true));         //more clear what im doing/testing
     }
