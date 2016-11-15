@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * Created by GabrielZapata on 11/2/16.
  */
 public class DataStructuresCategoryTable {
-    private static final String KEY_COLUMN = "ID";
+    private static final String KEY_COLUMN = "DCID";
     private static final String NAME_COLUMN = "name";
     private static final String DESCRIPTION_COLUMN = "description";
 

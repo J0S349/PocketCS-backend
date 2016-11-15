@@ -21,7 +21,7 @@ public class AlgorithmsCategoryTableIT {
 
     private static final String TABLE_NAME = "AlgorithmsCategoryTableTest";
     private static final String NAME_COLUMN = "name";
-
+    private static Item sessionRow;
 
     private DBConnector connector;
     private AlgorithmsCategoryTable table;
@@ -33,12 +33,14 @@ public class AlgorithmsCategoryTableIT {
         AlgorithmsCategoryTable.openTable(TABLE_NAME, connector).deleteTable();
         table = AlgorithmsCategoryTable.createTable(TABLE_NAME, connector);
 
-        String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+        sessionRow = new Item()
+                    .withPrimaryKey(AlgorithmsCategoryTable.getKeyColumn(), 3)
+                    .withString(AlgorithmsCategoryTable.getNameColumn(), "Divide-and-conquer")
+                    .withString(AlgorithmsCategoryTable.getDescriptionColumn(), "recursively breaking down a problem into two or more " +
+                            "sub-problems of the same or related type, until these " +
+                            "become simple enough to be solved directly.");
 
-        table.put(3, "Divide-and-conquer","recursively breaking down a problem into" +
-                " two or more sub-problems of the same or related type, until these " +
-                "become simple enough to be solved directly.");
-
+        table.put(sessionRow);
     }
 
     @After
@@ -49,22 +51,25 @@ public class AlgorithmsCategoryTableIT {
 
     @Test
     public void createAndVerifyTable(){
-        Item result = table.get(3);
-        String  name = (String) result.get(NAME_COLUMN);
+        int keyColumn = sessionRow.getInt(AlgorithmsCategoryTable.getKeyColumn());
+        Item result = table.getItemWithAttribute(AlgorithmsCategoryTable.getKeyColumn(), keyColumn);
+        String  name = result.getString(AlgorithmsCategoryTable.getNameColumn());
 
         assertThat(name, equalTo("Divide-and-conquer"));
+
     }
 
     @Test
     public void updateItemOnTable(){
-        table.update(3, "Divide_and_conquer","recursively breaking down a problem into" +
-                " two or more sub-problems of the same or related type, until these " +
-                "become simple enough to be solved directly.");
+        sessionRow.with(AlgorithmsCategoryTable.getNameColumn(), "Divide_and_conquer");
+        boolean status = table.update(sessionRow);
+        assertThat(status, equalTo(true));
 
-        Item result = table.get(3);
-        String name = (String) result.get(NAME_COLUMN);
-
-        assertThat(name, equalTo("Divide_and_conquer"));
+//        sessionRow.with(AlgorithmsTable.getNameColumn(), "Binary Search Algorithm");
+//
+//        boolean status = table.update(sessionRow);
+//
+//        assertThat(status, equalTo(true));
     }
 
     @Test
