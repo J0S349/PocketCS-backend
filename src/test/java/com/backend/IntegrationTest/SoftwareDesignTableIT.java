@@ -1,6 +1,7 @@
 package com.backend.IntegrationTest;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.xspec.NULL;
 import com.backend.DBConnector;
 import com.backend.SoftwareDesignTable;
 import org.junit.After;
@@ -12,8 +13,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * Created by GabrielZapata on 10/30/16.
@@ -26,6 +26,7 @@ public class SoftwareDesignTableIT {
     private DBConnector connector;
     private SoftwareDesignTable table;
     private static Item sessionRow;
+    private String timeStamp;
 
 
     @Before
@@ -36,7 +37,7 @@ public class SoftwareDesignTableIT {
         table = SoftwareDesignTable.createTable(TABLE_NAME, connector);
 
         // Adding the same values every time
-        String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+        timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
 
         sessionRow = new Item()
                 .withPrimaryKey(SoftwareDesignTable.getKeyColumn(), UUID.randomUUID().toString())
@@ -75,15 +76,49 @@ public class SoftwareDesignTableIT {
     public void updateItemOnTable(){
 
         sessionRow.withString(SoftwareDesignTable.getNameColumn(), "Singleton Pattern");
-        //table.update(2,0, "Singleton Design", 1, "fill later", "its good", "its bad", "image.png", "01/01/16", "00/00/16", "linktohelp.com");
         boolean result = table.update(sessionRow);
 
         assertThat(result, equalTo(true));
     }
 
     @Test
-    public void deleteItem(){
+    public void deleteItemWithinTable(){
         boolean result = table.deleteItemWithPrimaryKey(sessionRow.getString(SoftwareDesignTable.getKeyColumn()));
         assertThat(result, equalTo(true));
     }
+    
+    @Test
+    public void deleteItem(){
+        boolean result = table.deleteItemWithPrimaryKey("123");
+
+        assertThat(result, equalTo(false));
+    }
+
+    @Test
+    public void insertItem(){
+        Item items = new Item()
+                .withPrimaryKey(SoftwareDesignTable.getKeyColumn(), UUID.randomUUID().toString())
+                .withLong(SoftwareDesignTable.getUserIdColumn(), 0)
+                .withString(SoftwareDesignTable.getNameColumn(), "Singleton")
+                .withLong(SoftwareDesignTable.getCategoryIdColumn(), 3)
+                .withString(SoftwareDesignTable.getDescriptionColumn(), "It prevents you from creating new instances across different" +
+                        " screens which is helpful when working with database instances")
+                .withString(SoftwareDesignTable.getBenefitColumn(), "The same instance can be sharec across different instances")
+                .withString(SoftwareDesignTable.getDownsideColumn(), "The object's data can be manipulated by other programs")
+                .withString(SoftwareDesignTable.getImageIdColumn(), "null")
+                .withString(SoftwareDesignTable.getDateCreatedColumn(), "today");
+
+        boolean result = table.put(items);
+
+        assertThat(result, equalTo(false));
+    }
+
+    @Test
+    public void getItem(){
+        String itemKey = sessionRow.getString(SoftwareDesignTable.getKeyColumn());
+        Item object = table.getItemWithAttribute(SoftwareDesignTable.getKeyColumn(), itemKey);
+
+        assertNotNull(object);
+    }
+
 }

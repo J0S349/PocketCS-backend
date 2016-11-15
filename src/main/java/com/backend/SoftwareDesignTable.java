@@ -1,9 +1,6 @@
 package com.backend;
 
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.ItemCollection;
-import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
-import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.base.Strings;
@@ -126,11 +123,17 @@ public class SoftwareDesignTable {
     }
 
     public boolean deleteItemWithPrimaryKey(String ID) {
+
+        // check whether item with the key is within the table or not
+        if(table.getItem(KEY_COLUMN, ID) == null)
+            return false;
+
         DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN,ID);
         try {
-            table.deleteItem(deleteItemSpec);
+            DeleteItemOutcome outcome = table.deleteItem(deleteItemSpec);
             return true;
         }catch (Exception e){
+            System.out.println("error occured");
             return false;
         }
     }
