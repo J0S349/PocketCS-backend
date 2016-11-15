@@ -31,10 +31,6 @@ public class DataStructuresCategoryTable {
                 .withAttributeName(KEY_COLUMN)
                 .withKeyType(KeyType.HASH); //Partition key
 
-        KeySchemaElement sortSchema = new KeySchemaElement().clone()
-                .withAttributeName(NAME_COLUMN)
-                .withKeyType(KeyType.RANGE);
-
         // Now we create a table request so that DynamoDB know that we want to create a table
         CreateTableRequest request = new CreateTableRequest()
                 .withTableName(tableName)
