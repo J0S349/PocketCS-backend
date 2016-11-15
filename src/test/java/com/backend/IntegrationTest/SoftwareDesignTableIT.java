@@ -88,14 +88,21 @@ public class SoftwareDesignTableIT {
     }
     
     @Test
-    public void deleteItem(){
+    public void deleteItemNotWithinTable(){
         boolean result = table.deleteItemWithPrimaryKey("123");
 
         assertThat(result, equalTo(false));
     }
 
     @Test
-    public void insertItem(){
+    public void deleteItemWithAnEmptyPrimaryKe(){
+        boolean result = table.deleteItemWithPrimaryKey("");
+
+        assertThat(result, equalTo(false));
+    }
+
+    @Test
+    public void insertItemWithInvalidNumberOfParameters(){
         Item items = new Item()
                 .withPrimaryKey(SoftwareDesignTable.getKeyColumn(), UUID.randomUUID().toString())
                 .withLong(SoftwareDesignTable.getUserIdColumn(), 0)
@@ -114,7 +121,7 @@ public class SoftwareDesignTableIT {
     }
 
     @Test
-    public void getItem(){
+    public void getItemWithinTable(){
         String itemKey = sessionRow.getString(SoftwareDesignTable.getKeyColumn());
         Item object = table.getItemWithAttribute(SoftwareDesignTable.getKeyColumn(), itemKey);
 

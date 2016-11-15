@@ -124,8 +124,11 @@ public class SoftwareDesignTable {
 
     public boolean deleteItemWithPrimaryKey(String ID) {
 
+        if(Strings.isNullOrEmpty(ID) || ID.equals(""))
+            return false;
+
         // check whether item with the key is within the table or not
-        if(table.getItem(KEY_COLUMN, ID) == null)
+        if((table.getItem(KEY_COLUMN, ID) == null))
             return false;
 
         DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN,ID);
