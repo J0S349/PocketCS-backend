@@ -36,6 +36,8 @@ public class SoftwareDesignTableIT {
         SoftwareDesignTable.openTable(TABLE_NAME, connector).deleteTable();
         table = SoftwareDesignTable.createTable(TABLE_NAME, connector);
 
+        assert(table != null);
+
         // Adding the same values every time
         timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
 

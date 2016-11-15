@@ -53,15 +53,19 @@ public class DataStructuresCategoryTableIT {
 
     @Test
     public void updateItemOnTable(){
-        table.update(3, "hash table", " Like HashMap, Hashtable stores " +
+        String description = " Like HashMap, Hashtable stores " +
                 "key/value pairs in a hash table. When using a Hashtable, " +
                 "you specify an object that is used as a key, and the value " +
-                "that you want linked to that key.");
+                "that you want linked to that key.";
+
+        String CategoryName = "hash table";
+        int id = 3;
+        table.update(id, CategoryName, description);
 
         Item result = table.get(3);
         String name = (String) result.get(NAME_COLUMN);
 
-        assertThat(name, equalTo("hash table"));
+        assertThat(name, equalTo(CategoryName));
     }
 
     @Test

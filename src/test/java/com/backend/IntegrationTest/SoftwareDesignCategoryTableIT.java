@@ -30,7 +30,8 @@ public class SoftwareDesignCategoryTableIT {
         connector = new DBConnector();
         DataStructuresCategoryTable.openTable(TABLE_NAME, connector).deleteTable();
         table = SoftwareDesignCategoryTable.createTable(TABLE_NAME, connector);
-
+        
+        assert(table != null);
         String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
 
         table.put(3, "Algorithm_strategy_pattern", "Addressing concerns related to " +
@@ -55,14 +56,17 @@ public class SoftwareDesignCategoryTableIT {
 
     @Test
     public void updateItemOnTable(){
-        table.update(3, "Algorithm strategy pattern", "Addressing concerns related to " +
+        String description = "Addressing concerns related to " +
                 "high-level strategies describing how to exploit application " +
-                "characteristics on a computing platform.");
+                "characteristics on a computing platform.";
+		String patternName = "Algorithm strategy pattern";
+		int iD = 3;
+		table.update(iD, patternName, description);
 
-        Item result = table.get(3);
+        Item result = table.get(iD);
         String name = (String) result.get(NAME_COLUMN);
 
-        assertThat(name, equalTo("Algorithm strategy pattern"));
+        assertThat(name, equalTo(patternName));
     }
 
     @Test

@@ -35,6 +35,8 @@ public class DataStructuresTableIT {
         DataStructuresTable.openTable(TABLE_NAME, connector).deleteTable();
         table = DataStructuresTable.createTable(TABLE_NAME, connector);
 
+        assert(table != null);
+        
         String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
         sessionRow = new Item()
                 .withPrimaryKey( DataStructuresTable.getKeyColumn(), UUID.randomUUID().toString())
