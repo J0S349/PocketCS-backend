@@ -203,7 +203,11 @@ public class AlgorithmsTable {
 
         Set<String> keys = map.keySet();
 
-        for (String key : keys) {
+        return containsValidNumberOfColumns(hashSet, map, keys);
+    }
+
+	private boolean containsValidNumberOfColumns(HashSet<String> hashSet, Map<String, Object> map, Set<String> keys) {
+		for (String key : keys) {
             if (!hashSet.contains(key)) {
                 return false;
             }
@@ -236,7 +240,7 @@ public class AlgorithmsTable {
         if(hashSet.isEmpty())
             return true;
         return false;
-    }
+	}
 
 
     // Getters for accessing column names

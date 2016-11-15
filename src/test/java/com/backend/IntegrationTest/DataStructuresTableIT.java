@@ -1,4 +1,4 @@
-package com.backend.IntegrationTest;
+	package com.backend.IntegrationTest;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.backend.DBConnector;
