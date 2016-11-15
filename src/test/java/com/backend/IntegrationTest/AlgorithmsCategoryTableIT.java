@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 public class AlgorithmsCategoryTableIT {
 
     private static final String TABLE_NAME = "AlgorithmsCategoryTableTest";
-    private static final String NAME_COLUMN = "name";
+    //private static final String NAME_COLUMN = "name";
     private static Item sessionRow;
 
     private DBConnector connector;
@@ -45,7 +45,7 @@ public class AlgorithmsCategoryTableIT {
 
     @After
     public void disconnect() {
-        table.deleteTable(); //error on line: 33
+        table.deleteTable();
         connector.close();
     }
 
@@ -62,14 +62,8 @@ public class AlgorithmsCategoryTableIT {
     @Test
     public void updateItemOnTable(){
         sessionRow.with(AlgorithmsCategoryTable.getNameColumn(), "Divide_and_conquer");
-        boolean status = table.update(sessionRow);
-        assertThat(status, equalTo(true));
-
-//        sessionRow.with(AlgorithmsTable.getNameColumn(), "Binary Search Algorithm");
-//
-//        boolean status = table.update(sessionRow);
-//
-//        assertThat(status, equalTo(true));
+        boolean status = table.update(sessionRow); //simplified the past test to make
+        assertThat(status, equalTo(true));         //more clear what im doing/testing
     }
 
     @Test
