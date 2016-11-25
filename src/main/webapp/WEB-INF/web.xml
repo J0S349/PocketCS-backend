@@ -4,4 +4,14 @@
 
 <web-app>
   <display-name>PocketCS Web Application</display-name>
+  <servlet>
+    <servlet-name>REST servlet</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>REST servlet</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
 </web-app>

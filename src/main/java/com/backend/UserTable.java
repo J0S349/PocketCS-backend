@@ -1,6 +1,9 @@
 package com.backend;
 
-import com.amazonaws.services.dynamodbv2.document.*;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.base.Strings;
@@ -9,24 +12,21 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * Created by Peeps on 10/26/16.
+ * Created by GabrielZapata on 11/22/16.
  */
-public class DataStructuresTable {
-    private static final String TABLE_NAME = "DataStructures";
-    private static final String KEY_COLUMN = "DSID";
-    private static final String USER_ID_COLUMN = "userID";
-    private static final String NAME_COLUMN = "DSName";
-    private static final String CATEGORY_ID_COLUMN = "categoryID";
-    private static final String DESCRIPTION_COLUMN = "description";
-    private static final String RUNTIME_COLUMN = "runtime";
-    private static final String IMAGE_ID_COLUMN = "imageID";
-    private static final String DATE_CREATED_COLUMN = "dateCreated";
-    private static final String DATE_UPDATED_COLUMN = "dateUpdated";
-    private static final String HELPFUL_LINK_COLUMN = "helpfulLink";
+public class UserTable {
+    private static final String TABLE_NAME = "user";
+    private static final String KEY_COLUMN = "facebookID";
+    private static final String FIRST_NAME_COLUMN = "firstName";
+    private static final String LAST_NAME_COLUMN = "lastName";
+    private static final String ALGO_NUM_COLUMN = "numOfAlgo";
+    private static final String DS_NUM_COLUMN = "numOfDS";
+    private static final String SD_NUM_COLUMN = "numOfSD";
+
 
     private Table table;
 
-    public static DataStructuresTable createTable(String tableName, DBConnector connector) {
+    public static UserTable createTable(String tableName, DBConnector connector){
 
         ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
@@ -40,7 +40,7 @@ public class DataStructuresTable {
                 .withKeyType(KeyType.HASH); //Partition key
 
         KeySchemaElement sortSchema = new KeySchemaElement().clone()
-                .withAttributeName(NAME_COLUMN)
+                .withAttributeName(FIRST_NAME_COLUMN)
                 .withKeyType(KeyType.RANGE);
 
         // Now we create a table request so that DynamoDB know that we want to create a table
@@ -58,8 +58,6 @@ public class DataStructuresTable {
         try {
             table = connector.getDynamoDB().createTable(request);
         } catch (Exception e){
-
-            e.printStackTrace();
             return null;
         }
 
@@ -71,20 +69,22 @@ public class DataStructuresTable {
             throw new RuntimeException(e);
         }
 
+        return new UserTable(table);
 
-        return new DataStructuresTable(table);
     }
 
-    private DataStructuresTable(Table table){
+    private UserTable(Table table){
         this.table = table;
     }
 
-    public static DataStructuresTable openTable(String tableName, DBConnector connector){
+    public static UserTable openTable(String tableName, DBConnector connector){
         Table table = connector.getDynamoDB().getTable(tableName);
-        return new DataStructuresTable(table);
+        return new UserTable(table);
     }
 
     public boolean put(Item item){
+
+        //check if it contains the appropriate paramters
         if(!validItem(item))
             return false;
 
@@ -93,58 +93,58 @@ public class DataStructuresTable {
             try{
                 table.putItem(item);
                 return true;
+
             } catch (Exception e){
                 return false;
             }
-
         }
-        else{
-            return false;
-        }
+        return false;
     }
 
     public boolean update(Item item){
 
-        // contains all the appropriate attributes
-        if(!validItem(item))
+        // check if it is a valid item
+        if(!validItem(item)){
             return false;
-        // check that the item is within the table already
-        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) != null){
+        }
 
-            // try adding it to the table
-            try {
-                // take advantage of table's ability to add / update values
-                // with putItem function
+        if(table.getItem(KEY_COLUMN, item.getString(KEY_COLUMN)) != null){
+            try{
+
                 table.putItem(item);
                 return true;
+
             } catch (Exception e){
-                e.printStackTrace();
                 return false;
             }
         }
         else{
+            // there is no item to update
             return false;
         }
     }
 
+    // will return the first item that it matches with
     public Item getItemWithAttribute(String columnName, String value){
         Item item = table.getItem(columnName, value);
         return item;
     }
+
     public Item getItemWithAttribute(String columnName, long value){
         Item item = table.getItem(columnName, value);
         return item;
     }
 
-    public boolean deleteItemWithPrimaryKey(String DSID) {
-        DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, DSID);
+    public boolean deleteItemWithPrimaryKey(String id) {
+        DeleteItemSpec deleteItemSpec = new DeleteItemSpec().withPrimaryKey(KEY_COLUMN, id);
         try {
             table.deleteItem(deleteItemSpec);
             return true;
-        } catch (Exception e){
+        }catch (Exception e){
             return false;
         }
     }
+
     public boolean deleteTable() {
         try {
             table.delete();
@@ -162,7 +162,7 @@ public class DataStructuresTable {
     }
 
     // Returns a JSON string of all the Items within the table. Uses a
-    // '<->' for the delimeter to parse the string in the future.
+    // '<->' for the delimiter to parse the string in the future.
     public String toJSON(){
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -177,22 +177,18 @@ public class DataStructuresTable {
             if(iterator.hasNext())
                 stringBuilder.append("<->");
         }
-
         return stringBuilder.toString();
     }
+
     public HashSet<String> getTableAttributes(){
         HashSet<String> hashSet = new HashSet<String>();
 
         hashSet.add(KEY_COLUMN);
-        hashSet.add(USER_ID_COLUMN);
-        hashSet.add(NAME_COLUMN);
-        hashSet.add(CATEGORY_ID_COLUMN);
-        hashSet.add(DESCRIPTION_COLUMN);
-        hashSet.add(RUNTIME_COLUMN);
-        hashSet.add(IMAGE_ID_COLUMN);
-        hashSet.add(DATE_CREATED_COLUMN);
-        hashSet.add(DATE_UPDATED_COLUMN);
-        hashSet.add(HELPFUL_LINK_COLUMN);
+        hashSet.add(FIRST_NAME_COLUMN);
+        hashSet.add(LAST_NAME_COLUMN);
+        hashSet.add(ALGO_NUM_COLUMN);
+        hashSet.add(DS_NUM_COLUMN);
+        hashSet.add(SD_NUM_COLUMN);
 
         return hashSet;
     }
@@ -204,6 +200,10 @@ public class DataStructuresTable {
 
         Set<String> keys = map.keySet();
 
+        return containsValidNumberOfColumns(hashSet, map, keys);
+    }
+
+    private boolean containsValidNumberOfColumns(HashSet<String> hashSet, Map<String, Object> map, Set<String> keys) {
         for (String key : keys) {
             if (!hashSet.contains(key)) {
                 return false;
@@ -238,17 +238,13 @@ public class DataStructuresTable {
             return true;
         return false;
     }
-    // Getters for accessing column names
 
+    // Getters for accessing column names
+    public static String getTableName(){return TABLE_NAME;}
     public static String getKeyColumn(){return KEY_COLUMN;}
-    public static String getNameColumn(){return NAME_COLUMN; }
-    public static String getDescriptionColumn(){return DESCRIPTION_COLUMN; }
-    public static String getUserIdColumn(){return USER_ID_COLUMN;}
-    public static String getCategoryIdColumn(){return CATEGORY_ID_COLUMN; }
-    public static String getRuntimeColumn(){return RUNTIME_COLUMN; }
-    public static String getImageIdColumn(){return IMAGE_ID_COLUMN; }
-    public static String getDateCreatedColumn(){return DATE_CREATED_COLUMN; }
-    public static String getDateUpdatedColumn(){return DATE_UPDATED_COLUMN; }
-    public static String getHelpfulLinkColumn(){return HELPFUL_LINK_COLUMN; }
-    public static String getTableName(){return TABLE_NAME; }
+    public static String getFirstNameColumn(){return FIRST_NAME_COLUMN;}
+    public static String getLastNameColumn(){return LAST_NAME_COLUMN;}
+    public static String getAlgoNumColumn(){return ALGO_NUM_COLUMN;}
+    public static String getDsNumColumn(){return DS_NUM_COLUMN;}
+    public static String getSdNumColumn(){ return SD_NUM_COLUMN;}
 }

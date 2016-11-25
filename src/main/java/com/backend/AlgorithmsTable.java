@@ -12,6 +12,7 @@ import java.util.*;
  * Created by Peeps on 10/25/16.
  */
 public class AlgorithmsTable {
+    private static final String TABLE_NAME ="Algorithms";
     private static final String KEY_COLUMN = "algoID";
     private static final String USER_ID_COLUMN = "userID";
     private static final String NAME_COLUMN = "algoName";
@@ -245,6 +246,7 @@ public class AlgorithmsTable {
 
     // Getters for accessing column names
     public static String getKeyColumn(){return KEY_COLUMN;}
+    public static String getTableName(){return TABLE_NAME;}
     public static String getNameColumn(){return NAME_COLUMN; }
     public static String getDescriptionColumn(){return DESCRIPTION_COLUMN; }
     public static String getUserIdColumn(){return USER_ID_COLUMN;}

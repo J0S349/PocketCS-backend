@@ -16,12 +16,12 @@ public class SoftwareDesignTable {
     private static final String TABLE_NAME = "SoftwareDesign";
     private static final String KEY_COLUMN = "SDID";
     private static final String USER_ID_COLUMN = "userID";
-    private static final String NAME_COLUMN = "SDName";
+    private static final String NAME_COLUMN = "SDName"; //<--don't know what this is for exactly.
     private static final String CATEGORY_ID_COLUMN = "categoryID";
     private static final String DESCRIPTION_COLUMN = "description";
-    private static final String BENEFIT_COLUMN = "benefit/analogy";
-    private static final String DOWNSIDE_COLUMN = "downside/analogy";
-    private static final String IMAGE_ID_COLUMN = "imageID";
+    private static final String BENEFIT_COLUMN = "benefit";
+    private static final String DOWNSIDE_COLUMN = "downside";
+    private static final String IMAGE_ID_COLUMN = "image";
     private static final String DATE_CREATED_COLUMN = "dateCreated";
     private static final String DATE_UPDATED_COLUMN = "dateUpdated";
     private static final String HELPFUL_LINK_COLUMN = "helpfulLink";
