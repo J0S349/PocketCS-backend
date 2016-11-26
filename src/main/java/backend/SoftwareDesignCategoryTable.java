@@ -1,4 +1,4 @@
-package com.backend;
+package backend;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
@@ -10,8 +10,9 @@ import java.util.ArrayList;
 /**
  * Created by GabrielZapata on 11/2/16.
  */
+
 public class SoftwareDesignCategoryTable {
-    private static final String KEY_COLUMN = "ID";
+    private static final String KEY_COLUMN = "SDID";
     private static final String NAME_COLUMN = "name";
     private static final String DESCRIPTION_COLUMN = "description";
 

@@ -1,4 +1,4 @@
-package com.backend;
+package backend;
 
 import com.amazonaws.auth.*;
 import com.amazonaws.regions.Regions;
@@ -15,7 +15,6 @@ import java.io.File;
  *  This is the class that will allow us to comunicate between the database and our application
  *
  */
-
 public class DBConnector {
 
     private static DynamoDB dynamoDB;
@@ -44,7 +43,7 @@ public class DBConnector {
         dynamoDB = new DynamoDB(client);
     }
 
-    public static void close(){
+    public void close(){
         dynamoDB.shutdown();
         client.shutdown();
     }

@@ -1,4 +1,4 @@
-package com.backend;
+package backend;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
@@ -10,8 +10,9 @@ import java.util.ArrayList;
 /**
  * Created by GabrielZapata on 11/2/16.
  */
+
 public class DataStructuresCategoryTable {
-    private static final String KEY_COLUMN = "ID";
+    private static final String KEY_COLUMN = "DCID";
     private static final String NAME_COLUMN = "name";
     private static final String DESCRIPTION_COLUMN = "description";
 
@@ -30,10 +31,6 @@ public class DataStructuresCategoryTable {
         KeySchemaElement keySchema = new KeySchemaElement()
                 .withAttributeName(KEY_COLUMN)
                 .withKeyType(KeyType.HASH); //Partition key
-
-        KeySchemaElement sortSchema = new KeySchemaElement().clone()
-                .withAttributeName(NAME_COLUMN)
-                .withKeyType(KeyType.RANGE);
 
         // Now we create a table request so that DynamoDB know that we want to create a table
         CreateTableRequest request = new CreateTableRequest()
