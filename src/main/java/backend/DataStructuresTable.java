@@ -176,7 +176,7 @@ public class DataStructuresTable {
         while (iterator.hasNext()){
             stringBuilder.append(iterator.next().toJSON());
             if(iterator.hasNext())
-                stringBuilder.append("<->");
+                stringBuilder.append("∑"); //using Sum notation character as delimeter
         }
 
         return stringBuilder.toString();

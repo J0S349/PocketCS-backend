@@ -9,12 +9,17 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.*;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.StringTokenizer;
 import java.util.UUID;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * Created by Peeps on 11/2/16.
@@ -122,6 +127,25 @@ public class    PocketResourceTest extends JerseyTest{
         String response = webTarget.request().get(String.class);
         assertEquals(response.intern(), "Success");
     }
-
+    // How to test the actual rest end point in AWS Elastic Beanstalk
+//    @Test
+//    public void testingActualAPI(){
+//        String baseURL = "http://sample-env.yf5ym3ie28.us-east-1.elasticbeanstalk.com/";
+//        Client client = ClientBuilder.newClient();
+//
+//        WebTarget target = client.target(baseURL).path("/rest/getTable").queryParam("tableName", "Algorithms");
+//        String response = target.request().get(String.class);
+//        try {
+//            response = URLDecoder.decode(response, "UTF-8");
+//
+//            StringTokenizer tokenizer = new StringTokenizer(response, "∑");
+//            while(tokenizer.hasMoreTokens()){
+//                System.out.println(tokenizer.nextToken());
+//            }
+//            System.out.print("response:\n"+response );
+//        }catch (Exception e){
+//            System.out.println("Error");
+//        }
+//    }
 
 }
