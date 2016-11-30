@@ -95,7 +95,7 @@ public class PocketResource {
                     .build();
         }
     }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
     @GET
     @Path("/start")
@@ -117,7 +117,106 @@ public class PocketResource {
         return result;
 
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    //Used to delete an Item in the table
+    @GET
+    @Path("/deleteItem")
+    public Response deleteItemFromTable(
+            @QueryParam("tableName") String tableName,
+            //@QueryParam("item") String item,
+            @QueryParam("key") String key //key is primaryKey for the table (which is a uuid)
 
+    )  {
+
+        List<String> missing = new ArrayList<String>();
+        if(tableName == null) missing.add("table name");
+        if( key == null) missing.add("key uuid");
+
+        if(!missing.isEmpty()){
+            String msg = "Missing parameters: " + missing.toString();
+            System.out.println(msg);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(msg)
+                    .build();
+        }
+
+        start();
+
+        String decodedKey = "";
+        if(!tables.contains(tableName)){
+            String msg = "table not found";
+            System.out.println(msg);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(msg)
+                    .build();
+        }
+
+        try {
+            decodedKey = URLDecoder.decode(key, "UTF-8");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        if(tableName.equals(ALGORITHMS_TABLE)){
+           algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
+
+            assert(algorithmsTable != null);
+
+            if(algorithmsTable.getItemWithAttribute(AlgorithmsTable.getKeyColumn(),decodedKey) != null){
+
+                boolean status = algorithmsTable.deleteItemWithPrimaryKey(decodedKey);
+                if(status)
+                    return Response.ok("Success").build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Unable to add to " + ALGORITHMS_TABLE + " table")
+                        .build();
+            }
+
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("invalid Item entered, does not meet the requirements for inserting value to "
+                            + ALGORITHMS_TABLE + " table")
+                    .build();
+        }
+        else if(tableName.equals(DataStructuresTable.getTableName())){
+            if(dataStructuresTable.getItemWithAttribute(DataStructuresTable.getKeyColumn(),decodedKey) != null){
+                boolean status = dataStructuresTable.deleteItemWithPrimaryKey(decodedKey);
+                //boolean status = dataStructuresTable.put(row);
+                //boolean status = false;
+                if(status)
+                    return Response.ok("Success").build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Unable to delete from " + DataStructuresTable.getTableName() + " table")
+                        .build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("invalid Item entered, does not meet the requirements for inserting value to "
+                            + DataStructuresTable.getTableName() + " table")
+                    .build();
+        }
+        else if(tableName.equals(SoftwareDesignTable.getTableName())){
+
+            if(softwareDesignTable.getItemWithAttribute(SoftwareDesignTable.getKeyColumn(),decodedKey) != null){
+                boolean status = softwareDesignTable.deleteItemWithPrimaryKey(decodedKey);
+
+                if(status)
+                    return Response.ok("Success").build();
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Unable to delete from " + SoftwareDesignTable.getTableName() + " table")
+                        .build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("invalid Item entered, does not meet the requirements for deleting item from "
+                            + SoftwareDesignTable.getTableName() + " table")
+                    .build();
+        }
+
+        System.out.println("Not a valid item");
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("wrong")
+                .build();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
     // Used to update an Item in the table.
     @GET
     @Path("/addItem")
