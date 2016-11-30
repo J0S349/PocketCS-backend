@@ -39,9 +39,7 @@ public class PocketResource {
 
     // adds table names to HashSet
     public void start(){
-
         dbConnector = new DBConnector();
-        test = "hello";
         tables = new HashSet<String>();
         tables.add(ALGORITHMS_TABLE);
         tables.add(DATA_STRUCTURES_TABLE);

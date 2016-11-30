@@ -47,7 +47,7 @@ public class UserTable {
         CreateTableRequest request = new CreateTableRequest()
                 .withTableName(tableName)
                 .withKeySchema(keySchema)
-                //.withKeySchema(sortSchema)
+                    //.withKeySchema(sortSchema)
                 .withAttributeDefinitions(attributeDefinitions)
                 .withProvisionedThroughput(new ProvisionedThroughput()
                         .withReadCapacityUnits(5L)

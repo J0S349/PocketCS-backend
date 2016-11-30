@@ -5,7 +5,7 @@
 
 <script>
 function getTable(){
-  var value = "DataStructures";
+  var value = "Algorithms";
   var tableName = "tableName";
   $.get("/rest/getTable",
     {tableName: value},
