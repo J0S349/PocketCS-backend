@@ -27,8 +27,15 @@ public class DataStructuresTable {
 
     private Table table;
 
-    public static DataStructuresTable createTable(String tableName, DBConnector connector) {
+    public static DataStructuresTable createTable(DBConnector connector) {
+        return createTableHelper(connector, TABLE_NAME);
+    }
 
+    public static DataStructuresTable createTable(DBConnector connector, String tableName){
+        return createTableHelper(connector, tableName);
+    }
+
+    private static DataStructuresTable createTableHelper(DBConnector connector, String tableName){
         ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
         attributeDefinitions.add(new AttributeDefinition()

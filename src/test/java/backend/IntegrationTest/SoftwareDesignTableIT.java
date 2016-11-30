@@ -1,7 +1,6 @@
 package backend.IntegrationTest;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.xspec.NULL;
 import backend.DBConnector;
 import backend.SoftwareDesignTable;
 import org.junit.After;
@@ -21,8 +20,6 @@ import static org.junit.Assert.*;
 
 public class SoftwareDesignTableIT {
     private static final String TABLE_NAME = "SoftwareDesignTableTest";
-    private static final String NAME_COLUMN = "SDName";
-
 
     private DBConnector connector;
     private SoftwareDesignTable table;
@@ -35,7 +32,7 @@ public class SoftwareDesignTableIT {
     {
         connector = new DBConnector();
         SoftwareDesignTable.openTable(TABLE_NAME, connector).deleteTable();
-        table = SoftwareDesignTable.createTable(TABLE_NAME, connector);
+        table = SoftwareDesignTable.createTable(connector, TABLE_NAME);
 
         assert(table != null);
 

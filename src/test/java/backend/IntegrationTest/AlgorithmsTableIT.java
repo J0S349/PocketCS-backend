@@ -30,7 +30,7 @@ public class AlgorithmsTableIT {
     {
         connector = new DBConnector();
         AlgorithmsTable.openTable(TABLE_NAME, connector).deleteTable();
-        table = AlgorithmsTable.createTable(TABLE_NAME, connector);
+        table = AlgorithmsTable.createTable(connector, TABLE_NAME);
 
         String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
         sessionRow = new Item()

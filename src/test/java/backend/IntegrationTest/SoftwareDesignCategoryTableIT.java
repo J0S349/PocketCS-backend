@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
 
 public class SoftwareDesignCategoryTableIT {
     private static final String TABLE_NAME = "SoftwareDesignCategoryTableTest";
-    private static final String NAME_COLUMN = "name";
+    private static final String NAME_COLUMN = SoftwareDesignCategoryTable.getNameColumn();
 
 
     private DBConnector connector;
@@ -30,7 +30,7 @@ public class SoftwareDesignCategoryTableIT {
     {
         connector = new DBConnector();
         DataStructuresCategoryTable.openTable(TABLE_NAME, connector).deleteTable();
-        table = SoftwareDesignCategoryTable.createTable(TABLE_NAME, connector);
+        table = SoftwareDesignCategoryTable.createTable(connector, TABLE_NAME);
         
         assert(table != null);
         
