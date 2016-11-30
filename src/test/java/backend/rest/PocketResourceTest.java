@@ -4,12 +4,14 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
 import backend.AlgorithmsTable;
+
 import com.amazonaws.services.dynamodbv2.document.Item;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.*;
 
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -26,13 +28,48 @@ import java.net.URLEncoder;
  * Created by Peeps on 11/2/16.
  */
 
+
 public class PocketResourceTest extends JerseyTest{
+
+    private final String ALGORITHMS_TABLE = "Algorithms";
+    private final String DATA_STRUCTURES_TABLE = "dataStructures";
+    private final String SOFTWARE_DESIGN_TABLE = "softwareDesign";
+    private Item sessionRow;
+
 
     @Override
     protected Application configure() {
         return new ResourceConfig(PocketResource.class);
     }
 
+
+    @Before
+    public void createItem() throws UnsupportedEncodingException
+    {
+        String uuid = UUID.randomUUID().toString();
+
+        sessionRow = new Item()
+                .withPrimaryKey("algoID", uuid)
+                .withLong("userID", 0)
+                .withString("algoName", "Binary Search")
+                .withInt("categoryID", 0)
+                .withString("description", "Does some searching")
+                .withString("runtime", "bla")
+                .withString("imageID", "rea")
+                .withString("dateCreated", "fds")
+                .withString("dateUpdated", "10/12/3134")
+                .withString("helpfulLink", "12/34/43");
+
+        WebTarget webTarget;
+        webTarget = target("addItem")
+                .queryParam("tableName", ALGORITHMS_TABLE)
+                .queryParam("item", URLEncoder.encode(sessionRow.toJSON(), "UTF-8")); // encode JSON string
+
+        String response = webTarget.request().get(String.class);
+
+        return;
+
+    }
 
     @Test
     public void TestingWithNoParameters(){
@@ -124,6 +161,39 @@ public class PocketResourceTest extends JerseyTest{
         String response = webTarget.request().get(String.class);
         assertEquals(response.intern(), "Success");
     }
+
+    @Test
+    public void deleteItemWithInvalidKey() throws UnsupportedEncodingException{
+
+        String key = URLEncoder.encode(UUID.randomUUID().toString(), "UTF-8");
+
+        WebTarget webTarget;
+        webTarget = target("deleteItem")
+        .queryParam("tableName", ALGORITHMS_TABLE)
+        .queryParam("key", key);
+
+        Response response = webTarget.request().get();
+
+        assertThat(response.getStatus(), equalTo(Response.Status.BAD_REQUEST.getStatusCode()));
+    }
+
+
+    @Test
+    public void deleteItemWithValidKey() throws UnsupportedEncodingException{
+        System.out.println("before assert");
+        String ValidUuid = sessionRow.get("algoID").toString();
+
+        WebTarget webTarget;
+        webTarget = target("deleteItem")
+                .queryParam("tableName", ALGORITHMS_TABLE)
+                .queryParam("key", ValidUuid);
+
+        String response = webTarget.request().get(String.class);
+
+        assertEquals(response.intern(), "Success");
+        System.out.println("right after assert");
+    }
+
     // How to test the actual rest end point in AWS Elastic Beanstalk
 //    @Test
 //    public void testingActualAPI(){
