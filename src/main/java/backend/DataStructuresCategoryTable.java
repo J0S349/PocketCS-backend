@@ -12,15 +12,24 @@ import java.util.ArrayList;
  */
 
 public class DataStructuresCategoryTable {
+
+    private static final String TABLE_NAME = "DataStructuresCategory";
     private static final String KEY_COLUMN = "DCID";
     private static final String NAME_COLUMN = "name";
     private static final String DESCRIPTION_COLUMN = "description";
 
     private Table table;
 
-    public static DataStructuresCategoryTable createTable(String tableName, DBConnector connector){
+    public static DataStructuresCategoryTable createTable(DBConnector connector){
+        return createTableHelper(connector, TABLE_NAME);
+    }
 
+    // This is mainly due to how we want to be able to test against a table within DynamoDB
+    public static DataStructuresCategoryTable createTable(DBConnector connector, String tableName){
+        return createTableHelper(connector, tableName);
+    }
 
+    private static DataStructuresCategoryTable createTableHelper(DBConnector connector, String tableName){
         ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
         attributeDefinitions.add(new AttributeDefinition()
@@ -63,6 +72,8 @@ public class DataStructuresCategoryTable {
 
         return new DataStructuresCategoryTable(table);
     }
+
+
 
     private DataStructuresCategoryTable(Table table){
         this.table = table;
@@ -122,4 +133,9 @@ public class DataStructuresCategoryTable {
         }
         return true; // Success table deletion
     }
+
+    public static String getTableName(){return TABLE_NAME; }
+    public static String getKeyColumn(){return KEY_COLUMN; }
+    public static String getNameColumn(){return NAME_COLUMN; }
+    public static String getDescriptionColumn(){return DESCRIPTION_COLUMN; }
 }

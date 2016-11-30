@@ -156,7 +156,6 @@ public class PocketResource {
 
             if(algorithmsTable.validItem(row)){
                 boolean status = algorithmsTable.put(row);
-                //boolean status = false;
                 if(status)
                     return Response.ok("Success").build();
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -171,7 +170,6 @@ public class PocketResource {
         else if(tableName.equals(DataStructuresTable.getTableName())){
             if(dataStructuresTable.validItem(row)){
                 boolean status = dataStructuresTable.put(row);
-                //boolean status = false;
                 if(status)
                     return Response.ok("Success").build();
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -184,7 +182,6 @@ public class PocketResource {
                     .build();
         }
         else if(tableName.equals(SoftwareDesignTable.getTableName())){
-
             if(softwareDesignTable.validItem(row)){ //still need to create this function in the table class
                 boolean status = softwareDesignTable.put(row); //fix attributes (i believe that is the issue with this 'put' function)
 

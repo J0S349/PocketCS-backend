@@ -30,7 +30,7 @@ public class DataStructuresCategoryTableIT {
     {
         connector = new DBConnector();
         DataStructuresCategoryTable.openTable(TABLE_NAME, connector).deleteTable();
-        table = DataStructuresCategoryTable.createTable(TABLE_NAME, connector);
+        table = DataStructuresCategoryTable.createTable(connector, TABLE_NAME);
 
         String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
 

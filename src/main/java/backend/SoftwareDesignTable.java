@@ -12,9 +12,9 @@ import java.util.*;
  * Created by Peeps on 10/31/16.
  */
 
-
 public class SoftwareDesignTable {
-    private static final String TABLE_NAME = "SoftwareDesign";
+
+    private static final String TABLE_NAME = "SoftwareDesigns";
     private static final String KEY_COLUMN = "SDID";
     private static final String USER_ID_COLUMN = "userID";
     private static final String NAME_COLUMN = "SDName";
@@ -29,8 +29,15 @@ public class SoftwareDesignTable {
 
     private Table table;
 
-    public static SoftwareDesignTable createTable(String tableName, DBConnector connector) {
+    public static SoftwareDesignTable createTable(DBConnector connector) {
+        return createTableHelper(connector, TABLE_NAME);
+    }
 
+    public static SoftwareDesignTable createTable(DBConnector connector, String tableName){
+        return createTableHelper(connector, tableName);
+    }
+
+    private static SoftwareDesignTable createTableHelper(DBConnector connector, String tableName){
         ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
         attributeDefinitions.add(new AttributeDefinition()
@@ -237,6 +244,7 @@ public class SoftwareDesignTable {
         return stringBuilder.toString();
     }
 
+    // Getters
     public static String getTableName(){return TABLE_NAME;}
     public static String getKeyColumn(){return KEY_COLUMN; }
     public static String getUserIdColumn(){return USER_ID_COLUMN; }

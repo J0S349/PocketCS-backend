@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
@@ -34,7 +33,7 @@ public class DataStructuresTableIT {
     {
         connector = new DBConnector();
         DataStructuresTable.openTable(TABLE_NAME, connector).deleteTable();
-        table = DataStructuresTable.createTable(TABLE_NAME, connector);
+        table = DataStructuresTable.createTable(connector, TABLE_NAME);
 
         assert(table != null);
         

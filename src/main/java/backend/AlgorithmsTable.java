@@ -13,6 +13,7 @@ import java.util.*;
  */
 
 public class AlgorithmsTable {
+    private static final String TABLE_NAME = "Algorithms";
     private static final String KEY_COLUMN = "algoID";
     private static final String USER_ID_COLUMN = "userID";
     private static final String NAME_COLUMN = "algoName";
@@ -26,7 +27,16 @@ public class AlgorithmsTable {
 
     private Table table;
 
-    public static AlgorithmsTable createTable(String tableName, DBConnector connector){
+    public static AlgorithmsTable createTable(DBConnector connector){
+        return createTableHelper(connector, TABLE_NAME);
+    }
+
+    // This is mainly due to how we want to be able to test against a table within DynamoDB
+    public static AlgorithmsTable createTable(DBConnector connector, String tableName){
+        return createTableHelper(connector, tableName);
+    }
+
+    private static AlgorithmsTable createTableHelper(DBConnector connector, String tableName){
 
         ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
@@ -35,8 +45,8 @@ public class AlgorithmsTable {
                 .withAttributeType(ScalarAttributeType.S));
 
         // Create the KeySchema for knowing what is primary key(s) of the table
-         KeySchemaElement keySchema = new KeySchemaElement()
-                 .withAttributeName(KEY_COLUMN)
+        KeySchemaElement keySchema = new KeySchemaElement()
+                .withAttributeName(KEY_COLUMN)
                 .withKeyType(KeyType.HASH); //Partition key
 
         KeySchemaElement sortSchema = new KeySchemaElement().clone()
@@ -70,9 +80,7 @@ public class AlgorithmsTable {
         }
 
         return new AlgorithmsTable(table);
-
     }
-
     private AlgorithmsTable(Table table){
         this.table = table;
     }
@@ -255,5 +263,6 @@ public class AlgorithmsTable {
     public static String getDateCreatedColumn(){return DATE_CREATED_COLUMN; }
     public static String getDateUpdatedColumn(){return DATE_UPDATED_COLUMN; }
     public static String getHelpfulLinkColumn(){return HELPFUL_LINK_COLUMN; }
+    public static String getTableName(){return TABLE_NAME;}
 }
 

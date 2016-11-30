@@ -6,9 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -30,7 +27,7 @@ public class AlgorithmsCategoryTableIT {
     {
         connector = new DBConnector();
         AlgorithmsCategoryTable.openTable(TABLE_NAME, connector).deleteTable();
-        table = AlgorithmsCategoryTable.createTable(TABLE_NAME, connector);
+        table = AlgorithmsCategoryTable.createTable(connector,TABLE_NAME);
 
         sessionRow = new Item()
                     .withPrimaryKey(AlgorithmsCategoryTable.getKeyColumn(), 3)

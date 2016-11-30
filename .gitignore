@@ -47,3 +47,9 @@ captures/
 access.ini
 .DS_Store
 */.DS_Store
+
+# Project seetings files
+.classpath
+.project
+.settings/*
+

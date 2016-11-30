@@ -3,6 +3,7 @@ package backend.rest;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
+import backend.AlgorithmsTable;
 import com.amazonaws.services.dynamodbv2.document.Item;
 
 import org.glassfish.jersey.server.ResourceConfig;
@@ -25,11 +26,7 @@ import java.net.URLEncoder;
  * Created by Peeps on 11/2/16.
  */
 
-public class    PocketResourceTest extends JerseyTest{
-
-    private final String ALGORITHMS_TABLE = "Algorithms";
-    private final String DATA_STRUCTURES_TABLE = "dataStructures";
-    private final String SOFTWARE_DESIGN_TABLE = "softwareDesign";
+public class PocketResourceTest extends JerseyTest{
 
     @Override
     protected Application configure() {
@@ -56,7 +53,7 @@ public class    PocketResourceTest extends JerseyTest{
     @Test
     public void validTableNameEntered(){
         WebTarget webTarget = target("getTable")
-                .queryParam("tableName", ALGORITHMS_TABLE);
+                .queryParam("tableName", AlgorithmsTable.getTableName());
 
         String result = webTarget.request().get(String.class);
 
@@ -76,7 +73,7 @@ public class    PocketResourceTest extends JerseyTest{
     @Test
     public void callAddItemEndPointWithWrongTableName(){
         WebTarget webTarget = target("addItem")
-                .queryParam("tableName", ALGORITHMS_TABLE);
+                .queryParam("tableName", AlgorithmsTable.getTableName());
 
         Response response = webTarget.request().get();
 
@@ -98,7 +95,7 @@ public class    PocketResourceTest extends JerseyTest{
 
         WebTarget webTarget;
         webTarget = target("addItem")
-                .queryParam("tableName", ALGORITHMS_TABLE)
+                .queryParam("tableName", AlgorithmsTable.getTableName())
                 .queryParam("item", URLEncoder.encode(sessionRow.toJSON(), "UTF-8")); // encode JSON string
 
         Response response = webTarget.request().get();
@@ -121,7 +118,7 @@ public class    PocketResourceTest extends JerseyTest{
 
         WebTarget webTarget;
         webTarget = target("addItem")
-                .queryParam("tableName", ALGORITHMS_TABLE)
+                .queryParam("tableName", AlgorithmsTable.getTableName())
                 .queryParam("item", URLEncoder.encode(sessionRow.toJSON(), "UTF-8")); // encode JSON string
 
         String response = webTarget.request().get(String.class);
