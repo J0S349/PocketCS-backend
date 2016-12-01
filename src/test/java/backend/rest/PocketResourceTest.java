@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 import backend.AlgorithmsTable;
 
+import backend.UserTable;
 import com.amazonaws.services.dynamodbv2.document.Item;
 
 import org.glassfish.jersey.server.ResourceConfig;
@@ -191,7 +192,27 @@ public class PocketResourceTest extends JerseyTest{
         String response = webTarget.request().get(String.class);
 
         assertEquals(response.intern(), "Success");
+
+    }
+
+    @Test
+    public void addUserToTable() throws UnsupportedEncodingException{
+       // System.out.println("before assert, in addUserToTableRestEndpoint");
+        String facebookID = UUID.randomUUID().toString();
+
+        WebTarget webTarget;
+        webTarget = target("addUsers")
+                .queryParam("facebookID", facebookID)
+                .queryParam("firstName", "Pepe")
+                .queryParam("lastName", "pepe");
+
+
+        String response = webTarget.request().get(String.class);
+        //System.out.println("response: " + response);
+        assertEquals(response.intern(), "Success");
         System.out.println("right after assert");
+
+
     }
 
     // How to test the actual rest end point in AWS Elastic Beanstalk
