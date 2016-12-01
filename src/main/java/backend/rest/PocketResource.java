@@ -1,9 +1,6 @@
 package backend.rest;
 
-import backend.AlgorithmsTable;
-import backend.DBConnector;
-import backend.DataStructuresTable;
-import backend.SoftwareDesignTable;
+import backend.*;
 import com.amazonaws.services.dynamodbv2.document.Item;
 
 import javax.ws.rs.GET;
@@ -28,6 +25,7 @@ public class PocketResource {
     private final String ALGORITHMS_TABLE = "Algorithms";
     private final String DATA_STRUCTURES_TABLE = "DataStructures";
     private final String SOFTWARE_DESIGN_TABLE = "softwareDesign";
+    private final String USER_TABLE = "user";
 
     // will be used to store the names of the tables for quick access
     private static HashSet<String> tables;
@@ -36,6 +34,7 @@ public class PocketResource {
     private static AlgorithmsTable algorithmsTable;
     private static DataStructuresTable dataStructuresTable;
     private static SoftwareDesignTable softwareDesignTable;
+    private static UserTable userTable;
 
     // adds table names to HashSet
     public void start(){
@@ -46,6 +45,7 @@ public class PocketResource {
         tables.add(ALGORITHMS_TABLE);
         tables.add(DATA_STRUCTURES_TABLE);
         tables.add(SOFTWARE_DESIGN_TABLE);
+        tables.add(USER_TABLE);
     }
 
     // Returns the contents from a specified table as JSON string
@@ -55,7 +55,7 @@ public class PocketResource {
             @QueryParam("tableName") String tableName
     ) throws UnsupportedEncodingException {
 
-        System.out.println("Hit End Point");
+        //System.out.println("Hit End Point");
         // check whether no parameters were passed
         if (tableName == null) {
             String msg = "missing parameter tableName";
@@ -64,7 +64,7 @@ public class PocketResource {
                     .build();
         }
         start();
-        System.out.print("Table name entered");
+        //System.out.print("Table name entered");
         if (!tables.contains(tableName)) {
             String msg = "table not found";
             System.out.println(msg);
@@ -73,7 +73,7 @@ public class PocketResource {
                     .build();
         }
 
-        System.out.println("Valid name entered");
+        //System.out.println("Valid name entered");
         if (tableName.equals(ALGORITHMS_TABLE)) {
             algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
             test = URLEncoder.encode(algorithmsTable.toJSON(), "UTF-8");
@@ -215,8 +215,71 @@ public class PocketResource {
                 .entity("wrong")
                 .build();
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // Used to decrement user's table of number regarding the specified table they're deleting an item from.
+    //@GET
+    //@Path("/decrementUserTable")
+
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
+    @GET
+    @Path("/addUsers")
+    public Response addToUserTable(
+            //@QueryParam("userTable") String userTable,
+            @QueryParam("facebookID") String facebookID,
+            @QueryParam("firstName") String firstName,
+            @QueryParam("lastName") String lastName
+    ) throws UnsupportedEncodingException {
+
+        List<String> missing = new ArrayList<String>();
+
+        //if (userTable == null) missing.add("user table");
+        if (facebookID == null) missing.add("facebookID key ");
+        if (firstName == null) missing.add("firstname ");
+        if (lastName == null) missing.add("lastname ");
+
+        if (!missing.isEmpty()) {
+            String msg = "Missing parameters: " + missing.toString();
+            System.out.println(msg);
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(msg)
+                    .build();
+        }
+
+        start();
+
+        UserTable userTable = UserTable.openTable(USER_TABLE, dbConnector);
+
+        String decodedFBID = "";
+        try {
+            decodedFBID = URLDecoder.decode(facebookID, "UTF-8");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //if the item exists in the userTable DB
+        if(userTable.getItemWithAttribute("facebookID", facebookID) != null)
+        {
+            return Response.ok("Success").build();
+        }
+        else //if the user does not exist in the DB, then add
+        {
+            Item newUser = new Item()
+                    .withPrimaryKey(UserTable.getKeyColumn(), facebookID)
+                    .withString(UserTable.getFirstNameColumn(), firstName)
+                    .withString(UserTable.getLastNameColumn(), lastName)
+                    .withLong(UserTable.getAlgoNumColumn(), 0)
+                    .withLong(UserTable.getSdNumColumn(), 0)
+                    .withLong(UserTable.getDsNumColumn(), 0);
+            userTable.put(newUser);
+            return Response.ok("Success").build();
+        }
+
+
+    }
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////
     // Used to update an Item in the table.
     @GET
     @Path("/addItem")
