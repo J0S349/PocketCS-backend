@@ -2,7 +2,12 @@ package backend;
 
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder;
+import com.amazonaws.services.dynamodbv2.xspec.S;
+import com.amazonaws.services.dynamodbv2.xspec.ScanExpressionSpec;
 import com.google.common.base.Strings;
 
 import java.math.BigDecimal;
@@ -170,12 +175,14 @@ public class AlgorithmsTable {
     }
 
     // Returns a JSON string of all the Items within the table. Uses a
-    // '<->' for the delimiter to parse the string in the future.
+    // '∑' for the delimiter to parse the string in the future.
     public String toJSON(){
         StringBuilder stringBuilder = new StringBuilder();
 
-        // get all the items from the table
-        ItemCollection<ScanOutcome> items = table.scan();
+
+        // get all the items from the table where the userID is 0. meaning it is the default ones
+        ScanFilter filter = new ScanFilter(USER_ID_COLUMN).eq(0);
+        ItemCollection<ScanOutcome> items = table.scan(filter);
 
         // get an iterator for the items in the table
         Iterator<Item> iterator = items.iterator();
@@ -183,7 +190,7 @@ public class AlgorithmsTable {
         while (iterator.hasNext()){
             stringBuilder.append(iterator.next().toJSON());
             if(iterator.hasNext())
-                stringBuilder.append("∑"); //using Sum notation character as delimeter
+                stringBuilder.append("∑"); //using Sum notation character (∑) as delimeter
         }
         return stringBuilder.toString();
     }

@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.base.Strings;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -174,7 +175,8 @@ public class DataStructuresTable {
     public String toJSON(){
         StringBuilder stringBuilder = new StringBuilder();
 
-        // get all the items from the table
+        // get all the items from the table where the userID is 0. meaning it is the default ones
+        ScanFilter filter = new ScanFilter(USER_ID_COLUMN).eq(0);
         ItemCollection<ScanOutcome> items = table.scan();
 
         // get an iterator for the items in the table

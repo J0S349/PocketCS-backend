@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -19,7 +20,7 @@ import static org.junit.Assert.*;
  */
 
 public class SoftwareDesignTableIT {
-    private static final String TABLE_NAME = "SoftwareDesignTableTest";
+    private static final String TABLE_NAME = "SoftwareDesignsTableTest";
 
     private DBConnector connector;
     private SoftwareDesignTable table;
@@ -43,10 +44,10 @@ public class SoftwareDesignTableIT {
                 .withPrimaryKey(SoftwareDesignTable.getKeyColumn(), UUID.randomUUID().toString())
                 .withLong(SoftwareDesignTable.getUserIdColumn(), 0)
                 .withString(SoftwareDesignTable.getNameColumn(), "Singleton")
-                .withLong(SoftwareDesignTable.getCategoryIdColumn(), 3)
+                .withLong(SoftwareDesignTable.getCategoryIdColumn(), 1)
                 .withString(SoftwareDesignTable.getDescriptionColumn(), "It prevents you from creating new instances across different" +
                             " screens which is helpful when working with database instances")
-                .withString(SoftwareDesignTable.getBenefitColumn(), "The same instance can be sharec across different instances")
+                .withString(SoftwareDesignTable.getBenefitColumn(), "The same instance can be shared across different instances")
                 .withString(SoftwareDesignTable.getDownsideColumn(), "The object's data can be manipulated by other programs")
                 .withString(SoftwareDesignTable.getImageIdColumn(), "null")
                 .withString(SoftwareDesignTable.getDateCreatedColumn(), timeStamp)
@@ -54,6 +55,7 @@ public class SoftwareDesignTableIT {
                 .withString(SoftwareDesignTable.getHelpfulLinkColumn(), "null");
 
         table.put(sessionRow);
+
     }
 
     @After
@@ -86,7 +88,7 @@ public class SoftwareDesignTableIT {
         boolean result = table.deleteItemWithPrimaryKey(sessionRow.getString(SoftwareDesignTable.getKeyColumn()));
         assertThat(result, equalTo(true));
     }
-    
+
     @Test
     public void deleteItemNotWithinTable(){
         boolean result = table.deleteItemWithPrimaryKey("123");
