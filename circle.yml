@@ -3,6 +3,7 @@ dependencies:
     - sudo apt-get update
     - sudo apt-get install python-dev
     - sudo pip install awsebcli
+
 test:
    override:
     - mvn verify
@@ -10,6 +11,7 @@ test:
     - mkdir -p $CIRCLE_TEST_REPORTS/reports/
     - cp ./*/*-reports/*.xml $CIRCLE_TEST_REPORTS/reports/
     - bash <(curl -s https://codecov.io/bash)
+
 notify:
    webhooks:
     - url: http://csumbse.net/harbormaster/hook/circleci/
@@ -18,4 +20,4 @@ deployment:
   production:
     branch: master
     commands: 
-      -eb deploy --staged
+      - eb deploy --staged
