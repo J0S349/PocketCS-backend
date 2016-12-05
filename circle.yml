@@ -1,3 +1,8 @@
+dependencies: 
+  pre: 
+    - sudo apt-get update
+    - sudo apt-get install python-dev
+    - sudo pip install awsebcli
 test:
    override:
     - mvn verify
@@ -8,3 +13,9 @@ test:
 notify:
    webhooks:
     - url: http://csumbse.net/harbormaster/hook/circleci/
+
+deployment: 
+  production:
+    branch: master
+    commands: 
+      -eb deploy --staged

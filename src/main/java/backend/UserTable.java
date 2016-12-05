@@ -26,8 +26,14 @@ public class UserTable {
 
     private Table table;
 
-    public static UserTable createTable(String tableName, DBConnector connector){
+    public static UserTable createTable(DBConnector connector){
+        return createTableHelper(connector, TABLE_NAME);
+    }
+    public static UserTable createTable(DBConnector connector, String tableName){
+        return createTableHelper(connector, tableName);
+    }
 
+    private static UserTable createTableHelper(DBConnector connector, String tableName){
         ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 
         attributeDefinitions.add(new AttributeDefinition()
@@ -47,7 +53,7 @@ public class UserTable {
         CreateTableRequest request = new CreateTableRequest()
                 .withTableName(tableName)
                 .withKeySchema(keySchema)
-                    //.withKeySchema(sortSchema)
+                //.withKeySchema(sortSchema)
                 .withAttributeDefinitions(attributeDefinitions)
                 .withProvisionedThroughput(new ProvisionedThroughput()
                         .withReadCapacityUnits(5L)
@@ -70,7 +76,6 @@ public class UserTable {
         }
 
         return new UserTable(table);
-
     }
 
     private UserTable(Table table){

@@ -1,7 +1,7 @@
 <html>
 <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 <body>
-<h2>Hello World!</h2>
+<h2>Welcome to the Home page of the PocketCS-app</h2>
 
 <script>
 function getTable(){

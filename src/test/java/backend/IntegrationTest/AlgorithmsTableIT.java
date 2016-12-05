@@ -47,7 +47,6 @@ public class AlgorithmsTableIT {
 
         table.put(sessionRow);
     }
-
     @After
     public void disconnect() {
         table.deleteTable(); //error on line: 33
