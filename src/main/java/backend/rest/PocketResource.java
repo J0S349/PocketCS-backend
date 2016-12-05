@@ -121,8 +121,7 @@ public class PocketResource {
     @Path("/deleteItem")
     public Response deleteItemFromTable(
             @QueryParam("tableName") String tableName,
-            //@QueryParam("item") String item,
-            @QueryParam("key") String key //key is primaryKey for the table (which is a uuid)
+             @QueryParam("key") String key //key is primaryKey for the table (which is a uuid)
 
     )  {
 
@@ -178,8 +177,7 @@ public class PocketResource {
         else if(tableName.equals(DataStructuresTable.getTableName())){
             if(dataStructuresTable.getItemWithAttribute(DataStructuresTable.getKeyColumn(),decodedKey) != null){
                 boolean status = dataStructuresTable.deleteItemWithPrimaryKey(decodedKey);
-                //boolean status = dataStructuresTable.put(row);
-                //boolean status = false;
+
                 if(status)
                     return Response.ok("Success").build();
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -299,6 +297,8 @@ public class PocketResource {
                 .entity("wrong")
                 .build();
     }
+
+
 
 
 }

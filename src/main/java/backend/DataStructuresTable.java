@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.base.Strings;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**

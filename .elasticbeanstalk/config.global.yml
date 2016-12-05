@@ -1,0 +1,10 @@
+branch-defaults: 
+  master: 
+    environment: Sample-env
+deploy:
+  artifact: target/dynamoDB-backend.war
+global: 
+  application_name: PocketCS-API
+  default_region: us-east-1
+  sc: git
+

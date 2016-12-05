@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
-import backend.UserTable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -32,7 +31,7 @@ public class UserTableIT {
     {
         connector = new DBConnector();
         UserTable.openTable(TABLE_NAME, connector).deleteTable();
-        table = UserTable.createTable(TABLE_NAME, connector);
+        table = UserTable.createTable(connector, TABLE_NAME);
 
         String timeStamp = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
         sessionRow = new Item()
