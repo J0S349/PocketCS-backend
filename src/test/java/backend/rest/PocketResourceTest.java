@@ -36,6 +36,7 @@ public class PocketResourceTest extends JerseyTest{
     private final String DATA_STRUCTURES_TABLE = "dataStructures";
     private final String SOFTWARE_DESIGN_TABLE = "softwareDesign";
     private Item sessionRow;
+    private String uuid;
 
 
     @Override
@@ -47,7 +48,7 @@ public class PocketResourceTest extends JerseyTest{
     @Before
     public void createItem() throws UnsupportedEncodingException
     {
-        String uuid = UUID.randomUUID().toString();
+        uuid = UUID.randomUUID().toString();
 
         sessionRow = new Item()
                 .withPrimaryKey("algoID", uuid)
@@ -70,6 +71,16 @@ public class PocketResourceTest extends JerseyTest{
 
         return;
 
+    }
+
+    @After
+    public void deleteItem(){
+        WebTarget webTarget;
+        webTarget = target("deleteItem")
+                .queryParam("tableName", ALGORITHMS_TABLE)
+                .queryParam("key",uuid );
+
+        webTarget.request().get();
     }
 
     @Test

@@ -29,8 +29,6 @@ public class PocketResource {
 
     // will be used to store the names of the tables for quick access
     private static HashSet<String> tables;
-    private static String test;
-
     private static AlgorithmsTable algorithmsTable;
     private static DataStructuresTable dataStructuresTable;
     private static SoftwareDesignTable softwareDesignTable;
@@ -74,9 +72,7 @@ public class PocketResource {
         //System.out.println("Valid name entered");
         if (tableName.equals(ALGORITHMS_TABLE)) {
             algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
-            test = URLEncoder.encode(algorithmsTable.toJSON(), "UTF-8");
-            return Response.ok(test).build();
-
+            return Response.ok(URLEncoder.encode(algorithmsTable.toJSON(), "UTF-8")).build();
 
         } else if (tableName.equals(DATA_STRUCTURES_TABLE)) {
             dataStructuresTable = DataStructuresTable.openTable(DATA_STRUCTURES_TABLE, dbConnector);
@@ -93,28 +89,7 @@ public class PocketResource {
                     .build();
         }
     }
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @GET
-    @Path("/start")
-    public String begin(){
-        return test;
-    }
-
-    @GET
-    @Path("/stop")
-    public String stop() {
-        String result = "Failure";
-        try {
-            result = URLDecoder.decode(test, "UTF-8");
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        return result;
-
-    }
     //////////////////////////////////////////////////////////////////////////////////////////////////
     //Used to delete an Item in the table
     @GET
