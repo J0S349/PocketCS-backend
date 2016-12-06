@@ -64,6 +64,7 @@ public class PocketResource {
         if (!tables.contains(tableName)) {
             String msg = "table not found";
             System.out.println(msg);
+            Logging.getLOG().debug("user requested to get table, table name not found. ");
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(msg)
                     .build();
@@ -72,14 +73,17 @@ public class PocketResource {
         //System.out.println("Valid name entered");
         if (tableName.equals(ALGORITHMS_TABLE)) {
             algorithmsTable = AlgorithmsTable.openTable(ALGORITHMS_TABLE, dbConnector);
+            Logging.getLOG().debug("user requested to get table, table: " + ALGORITHMS_TABLE);
             return Response.ok(URLEncoder.encode(algorithmsTable.toJSON(), "UTF-8")).build();
 
         } else if (tableName.equals(DATA_STRUCTURES_TABLE)) {
             dataStructuresTable = DataStructuresTable.openTable(DATA_STRUCTURES_TABLE, dbConnector);
+            Logging.getLOG().debug("user requested to get table, table: " + DATA_STRUCTURES_TABLE);
             return Response.ok(URLEncoder.encode(dataStructuresTable.toJSON(), "UTF-8")).build();
 
         } else if (tableName.equals(SOFTWARE_DESIGN_TABLE)) {
             softwareDesignTable = SoftwareDesignTable.openTable(SOFTWARE_DESIGN_TABLE, dbConnector);
+            Logging.getLOG().debug("user requested to get table, table: " + SOFTWARE_DESIGN_TABLE);
             return Response.ok(URLEncoder.encode(softwareDesignTable.toJSON(), "UTF-8")).build();
 
         } else {
@@ -107,6 +111,7 @@ public class PocketResource {
         if(!missing.isEmpty()){
             String msg = "Missing parameters: " + missing.toString();
             System.out.println(msg);
+            Logging.getLOG().debug("user requested to delete an item, parameters missing: " + msg);
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(msg)
                     .build();
@@ -118,6 +123,7 @@ public class PocketResource {
         if(!tables.contains(tableName)){
             String msg = "table not found";
             System.out.println(msg);
+            Logging.getLOG().debug("user requested to delete item, table not found. error: " + Response.Status.BAD_REQUEST);
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(msg)
                     .build();
@@ -137,8 +143,10 @@ public class PocketResource {
             if(algorithmsTable.getItemWithAttribute(AlgorithmsTable.getKeyColumn(),decodedKey) != null){
 
                 boolean status = algorithmsTable.deleteItemWithPrimaryKey(decodedKey);
-                if(status)
+                if(status) {
+                    Logging.getLOG().debug("user requested to delete item from algorithms, item: " + algorithmsTable.getItemWithAttribute(AlgorithmsTable.getKeyColumn(),decodedKey));
                     return Response.ok("Success").build();
+                }
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Unable to add to " + ALGORITHMS_TABLE + " table")
                         .build();
@@ -153,8 +161,10 @@ public class PocketResource {
             if(dataStructuresTable.getItemWithAttribute(DataStructuresTable.getKeyColumn(),decodedKey) != null){
                 boolean status = dataStructuresTable.deleteItemWithPrimaryKey(decodedKey);
 
-                if(status)
+                if(status) {
+                    Logging.getLOG().debug("user requested to delete item from dataStructures, item: " + dataStructuresTable.getItemWithAttribute(DataStructuresTable.getKeyColumn(),decodedKey));
                     return Response.ok("Success").build();
+                }
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Unable to delete from " + DataStructuresTable.getTableName() + " table")
                         .build();
@@ -169,8 +179,10 @@ public class PocketResource {
             if(softwareDesignTable.getItemWithAttribute(SoftwareDesignTable.getKeyColumn(),decodedKey) != null){
                 boolean status = softwareDesignTable.deleteItemWithPrimaryKey(decodedKey);
 
-                if(status)
+                if(status) {
+                    Logging.getLOG().debug("user requested to delete item from softwareDesigns, item: " + softwareDesignTable.getItemWithAttribute(SoftwareDesignTable.getKeyColumn(),decodedKey));
                     return Response.ok("Success").build();
+                }
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Unable to delete from " + SoftwareDesignTable.getTableName() + " table")
                         .build();
@@ -213,6 +225,7 @@ public class PocketResource {
         if (!missing.isEmpty()) {
             String msg = "Missing parameters: " + missing.toString();
             System.out.println(msg);
+            Logging.getLOG().debug("users first login to app, but error occurred, missing params: " + missing.toString());
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(msg)
                     .build();
@@ -232,10 +245,12 @@ public class PocketResource {
         //if the item exists in the userTable DB
         if(userTable.getItemWithAttribute("facebookID", facebookID) != null)
         {
+            Logging.getLOG().debug("user has logged in before, FBID: " + facebookID + " firstName: " + firstName + "lastName: " + lastName);
             return Response.ok("Success").build();
         }
         else //if the user does not exist in the DB, then add
         {
+            Logging.getLOG().debug("user hasn't logged in before, FBID: " + facebookID + " firstName: " + firstName + "lastName: " + lastName);
             Item newUser = new Item()
                     .withPrimaryKey(UserTable.getKeyColumn(), facebookID)
                     .withString(UserTable.getFirstNameColumn(), firstName)
@@ -266,6 +281,7 @@ public class PocketResource {
         if(!missing.isEmpty()){
             String msg = "Missing parameters: " + missing.toString();
             System.out.println(msg);
+            Logging.getLOG().debug("user trying to add item, Missing parameters: " + missing.toString());
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(msg)
                     .build();
@@ -276,6 +292,7 @@ public class PocketResource {
         if(!tables.contains(tableName)){
             String msg = "table not found";
             System.out.println(msg);
+            Logging.getLOG().debug("user trying to add item, doesn't contain table: " + tableName);
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(msg)
                     .build();
@@ -289,8 +306,10 @@ public class PocketResource {
 
             if(algorithmsTable.validItem(row)){
                 boolean status = algorithmsTable.put(row);
-                if(status)
+                if(status) {
+                    Logging.getLOG().debug("user trying to add item to algorithms, item: "  + item);
                     return Response.ok("Success").build();
+                }
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Unable to add to " + ALGORITHMS_TABLE + " table")
                         .build();
@@ -303,8 +322,10 @@ public class PocketResource {
         else if(tableName.equals(DataStructuresTable.getTableName())){
             if(dataStructuresTable.validItem(row)){
                 boolean status = dataStructuresTable.put(row);
-                if(status)
+                if(status) {
+                    Logging.getLOG().debug("user trying to add item to data structures, item: "  + item);
                     return Response.ok("Success").build();
+                }
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Unable to add to " + DataStructuresTable.getTableName() + " table")
                         .build();
@@ -318,8 +339,10 @@ public class PocketResource {
             if(softwareDesignTable.validItem(row)){ //still need to create this function in the table class
                 boolean status = softwareDesignTable.put(row); //fix attributes (i believe that is the issue with this 'put' function)
 
-                if(status)
+                if(status) {
+                    Logging.getLOG().debug("user trying to add item to software design, item: "  + item);
                     return Response.ok("Success").build();
+                }
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Unable to add to " + SoftwareDesignTable.getTableName() + " table")
                         .build();
@@ -331,6 +354,7 @@ public class PocketResource {
         }
 
         System.out.println("Not a valid item");
+        Logging.getLOG().debug("user trying to add item, item not valid ");
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity("wrong")
                 .build();
