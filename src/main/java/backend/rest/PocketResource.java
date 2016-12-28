@@ -1,18 +1,27 @@
 package backend.rest;
 
 import backend.*;
+import com.amazonaws.SystemDefaultDnsResolver;
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.eclipse.jetty.util.ajax.JSON;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Peeps on 11/23/16.
@@ -22,10 +31,10 @@ import java.util.List;
 public class PocketResource {
 
     private DBConnector dbConnector;
-    private final String ALGORITHMS_TABLE = "Algorithms";
-    private final String DATA_STRUCTURES_TABLE = "DataStructures";
-    private final String SOFTWARE_DESIGN_TABLE = "softwareDesign";
-    private final String USER_TABLE = "user";
+    private final String ALGORITHMS_TABLE = AlgorithmsTable.getTableName();
+    private final String DATA_STRUCTURES_TABLE = DataStructuresTable.getTableName();
+    private final String SOFTWARE_DESIGN_TABLE = SoftwareDesignTable.getTableName();
+    private final String USER_TABLE = UserTable.getTableName();
 
     // will be used to store the names of the tables for quick access
     private static HashSet<String> tables;
@@ -360,6 +369,79 @@ public class PocketResource {
                 .build();
     }
 
+    // This endpoint is currently being used for an iOS application. Will remove it once we get graded on it
+    // -- Thankx :)
+    @GET
+    @Path("/getRecipes")
+    public Response getRecipes(
+            @QueryParam("items") String ingredients
+    ){
+
+        try {
+            String decodedRecipes = URLDecoder.decode(ingredients, "UTF-8");
+        } catch (Exception e){
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Error")
+                    .build();
+        }
+
+        String baseURL = "https://api.edamam.com/search";
+        Client client = ClientBuilder.newClient();
+
+        WebTarget target = client.target(baseURL)
+                .queryParam("app_id", "d1fc9900")
+                .queryParam("app_key", "a9307ac9d85fe8df2ad5d37597245915")
+                .queryParam("q", ingredients);
+        String response = target.request().get(String.class);
+
+        JSONObject jsonObject = new JSONObject(response);
+
+        String recipes = jsonObject.get("hits").toString();
+
+        JSONArray array = new JSONArray(recipes);
+
+        StringBuilder results = new StringBuilder();
+        for(int i = 0; i < array.length(); i++){
+            JSONObject object = (JSONObject) array.get(i);
+            JSONObject recipeObject = (JSONObject) object.get("recipe");
+
+            //System.out.println(recipeObject.keySet());
+//            System.out.println("Label: " + recipeObject.get("label"));
+//            System.out.println("Image: " + recipeObject.get("image"));
+//            System.out.println("URL: " + recipeObject.get("url"));
+//            System.out.println();
+
+            JSONObject data = new JSONObject();
+            data.put("label", recipeObject.get("label"));
+            data.put("image", recipeObject.get("image"));
+            data.put("url", recipeObject.get("url"));
+
+            results.append(data.toString() + "∑");
+        }
+
+        System.out.println(results.toString());
+
+        return Response.ok(results.toString()).build();
+
+        // Parsing JSON response
+
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//
+//        try{
+//            Map<String, Object> map = objectMapper.readValue(response, new TypeReference<Map<String, Object>>() {
+//            });
+//
+//            //StringTokenizer tokenizer = new StringTokenizer(map.get("hits").toString(), "recipe=");
+//           // System.out.println(map.get("hits"));
+//            //System.out.println(map.keySet());
+//
+//        }
+//        catch (Exception e){
+//            System.out.println("Error parsing string");
+//        }
+//        return null;
+    }
 
 
 

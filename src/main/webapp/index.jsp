@@ -5,14 +5,24 @@
 
 <script>
 function getTable(){
-  var value = "Algorithms";
-  var tableName = "tableName";
-  $.get("/rest/getTable",
-    {tableName: value},
+  var value = "potato, beans, lettuce";
+  var tableName = "items";
+  $.get("/rest/getRecipes",
+    {"items": value},
     function(result){
-      result = decodeURI(result);
-      result = decodeURI(result);
-      console.log("result: " + result);
+
+      //console.log("result: " + result);
+      var val = JSON.parse(result);
+      var recipes = val["hits"];
+      for(var key in recipes){
+        var recipeObject = recipes[key]["recipe"];
+        console.log("recipe name: " + recipeObject["label"]);
+        console.log("Image URL: " + recipeObject["image"]);
+        console.log("Recipe URL: " + recipeObject["url"]);
+        console.log("--------------------------------------------------");
+      }
+
+
     })
     .fail(function(jqXHR, textStatus, errorThrown){
       console.log(errorThrown);
